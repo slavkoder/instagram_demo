@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">InstagramDemo</string>
+
+    <!-- Instagram API message -->
+    <string name="wait_access_token">Getting access token...</string>
+
+    <!-- BaseActivity -->
+    <string name="busy_dialog_default_message">Please wait, loading...</string>
+
+    <!-- UiUtils strings -->
+    <string name="info_dialog_title">Info</string>
+    <string name="error_dialog_title">Error Occurred</string>
+    <string name="unexpected_error_message">An unexpected error occurred</string>
+
 </resources>
