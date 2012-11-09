@@ -5,8 +5,6 @@
  */
 package fi.spanasenko.android;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -26,12 +24,9 @@ import fi.spanasenko.android.utils.UiUtils;
  * NearbyLocationsActivity
  * Screen which shows nearby locations list for Instagram user. Calls authentication if needed.
  */
-public class NearbyLocationsActivity extends Activity {
+public class NearbyLocationsActivity extends BaseActivity {
 
     private InstagramApi mInstagram;
-
-    private ProgressDialog mProgress;
-
     private ListView mLocationList;
 
     @Override
@@ -40,9 +35,6 @@ public class NearbyLocationsActivity extends Activity {
         setContentView(R.layout.login_screen);
 
         mLocationList = (ListView) findViewById(android.R.id.list);
-
-        mProgress = new ProgressDialog(this);
-        mProgress.setCancelable(false);
 
         mInstagram = InstagramApi.getInstance(this);
         if (!mInstagram.hasAccessToken()) {
@@ -56,20 +48,19 @@ public class NearbyLocationsActivity extends Activity {
      * Initiates Instagram authorization.
      */
     private void authorize() {
-        mProgress.setMessage(getString(R.string.wait_access_token));
-        mProgress.show();
+        showBusyDialog(R.string.wait_access_token);
 
         mInstagram.authorize(new VoidOperationCallback(OperationCallbackBase.DispatchType.MainThread) {
             @Override
             protected void onCompleted() {
-                mProgress.dismiss();
+                dismissBusyDialog();
                 Toast.makeText(NearbyLocationsActivity.this, "Authorized successfully!", Toast.LENGTH_LONG).show();
                 loadLocations();
             }
 
             @Override
             protected void onError(Exception error) {
-                mProgress.dismiss();
+                dismissBusyDialog();
                 UiUtils.displayError(NearbyLocationsActivity.this, error);
             }
         });
@@ -79,8 +70,7 @@ public class NearbyLocationsActivity extends Activity {
      * Initiates loading locations from Instagram.
      */
     private void loadLocations() {
-        mProgress.setMessage(getString(R.string.wait_locations));
-        mProgress.show();
+        showBusyDialog(R.string.wait_locations);
 
         // Returns last known location
         LocationInfo lastKnown = new LocationInfo(getBaseContext());
@@ -89,13 +79,13 @@ public class NearbyLocationsActivity extends Activity {
                 new OperationCallback<Location[]>(OperationCallbackBase.DispatchType.MainThread) {
             @Override
             protected void onCompleted(Location[] result) {
-                mProgress.dismiss();
+                dismissBusyDialog();
                 updateList(result);
             }
 
             @Override
             protected void onError(Exception error) {
-                mProgress.dismiss();
+                dismissBusyDialog();
                 UiUtils.displayError(NearbyLocationsActivity.this, error);
             }
         });

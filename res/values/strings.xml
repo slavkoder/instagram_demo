@@ -1,15 +1,18 @@
 <resources>
     <string name="app_name">InstagramDemo</string>
 
-    <!-- Instagram API message -->
+    <!-- Wait messages -->
     <string name="wait_access_token">Getting access token...</string>
     <string name="wait_locations">Fetching locations...</string>
-
-    <!-- BaseActivity -->
+    <string name="wait_media">Fetching media for selected location...</string>
     <string name="busy_dialog_default_message">Please wait, loading...</string>
 
     <!-- Nearby locations -->
     <string name="distance_km">km.</string>
+
+    <!-- Image Gallery Activity -->
+    <string name="no_media_title">No media found</string>
+    <string name="no_media_message">Unfortunately there is no media found for this location, try another one.</string>
 
     <!-- UiUtils strings -->
     <string name="info_dialog_title">Info</string>
