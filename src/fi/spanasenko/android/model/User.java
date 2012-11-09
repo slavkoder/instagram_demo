@@ -58,7 +58,7 @@ public class User extends BaseModel {
     }
 
     public void setAccessToken(String accessToken) {
-        this.access_token = access_token;
+        this.access_token = accessToken;
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>()

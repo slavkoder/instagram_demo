@@ -18,8 +18,8 @@
         android:label="@string/app_name"
         android:name=".InstagramDemoApp">
 
-        <!-- LoginActivity -->
-        <activity android:name=".LoginActivity"
+        <!-- NearbyLocationsActivity -->
+        <activity android:name=".NearbyLocationsActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Light">
@@ -28,6 +28,18 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <!-- ImageGalleryActivity -->
+        <activity android:name=".ImageGalleryActivity"
+            android:label="@string/app_name"
+            android:configChanges="orientation"
+            android:theme="@android:style/Theme.Light" />
+
+        <!-- ViewImageActivity -->
+        <activity android:name=".ViewImageActivity"
+            android:label="@string/app_name"
+            android:configChanges="orientation"
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" />
 
         <!-- Little Fluffy Location Library -->
         <service android:name="com.littlefluffytoys.littlefluffylocationlibrary.LocationBroadcastService"/>

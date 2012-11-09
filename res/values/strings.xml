@@ -3,9 +3,13 @@
 
     <!-- Instagram API message -->
     <string name="wait_access_token">Getting access token...</string>
+    <string name="wait_locations">Fetching locations...</string>
 
     <!-- BaseActivity -->
     <string name="busy_dialog_default_message">Please wait, loading...</string>
+
+    <!-- Nearby locations -->
+    <string name="distance_km">km.</string>
 
     <!-- UiUtils strings -->
     <string name="info_dialog_title">Info</string>

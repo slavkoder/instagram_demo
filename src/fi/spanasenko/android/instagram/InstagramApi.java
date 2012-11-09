@@ -1,18 +1,21 @@
 package fi.spanasenko.android.instagram;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import com.google.gson.Gson;
-import fi.spanasenko.android.R;
+import fi.spanasenko.android.model.Location;
+import fi.spanasenko.android.model.Media;
 import fi.spanasenko.android.model.User;
 import fi.spanasenko.android.utils.UserSettings;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Thiago Locatelli <thiago.locatelli@gmail.com>
@@ -30,12 +33,13 @@ public class InstagramApi {
     private String mTokenUrl;
     private String mAccessToken;
     private Context mCtx;
-    private ProgressDialog mProgress;
 
     // Instagram API endpoints
     private static final String AUTH_URL = "https://api.instagram.com/oauth/authorize/";
     private static final String TOKEN_URL = "https://api.instagram.com/oauth/access_token";
     private static final String API_URL = "https://api.instagram.com/v1";
+    private static final String LOCATIONS_ENDPOINT_FORMAT = "/locations/search?lat=%f&lng=%f&access_token=%s";
+    private static final String MEDIA_ENDPOINT_FORMAT = "/locations/%s/media/recent?access_token=%s";
 
     // Instagram API keys
     public static final String CLIENT_ID = "ab11cf78383844adba1c73ce9363f2de";
@@ -93,9 +97,6 @@ public class InstagramApi {
         InstagramDialog.OAuthDialogListener listener = new InstagramDialog.OAuthDialogListener() {
             @Override
             public void onComplete(String code) {
-                mProgress.setMessage(mCtx.getString(R.string.wait_access_token));
-                mProgress.show();
-
                 getAccessToken(code, new OperationCallback<User>() {
                     @Override
                     protected void onCompleted(User result) {
@@ -104,28 +105,24 @@ public class InstagramApi {
                                 result.getFullName());
 
                         // Notify caller application
-                        callback.onCompleted();
+                        callback.notifyCompleted();
                     }
 
                     @Override
                     protected void onError(Exception error) {
-                        mProgress.dismiss();
-                        callback.onError(error);
+                        callback.notifyError(error);
                     }
                 });
             }
 
             @Override
             public void onError(String error) {
-                callback.onError(new Exception(error));
+                callback.notifyError(new Exception(error));
             }
         };
 
         InstagramDialog dialog = new InstagramDialog(mCtx, mAuthUrl, listener);
         dialog.show();
-
-        mProgress = new ProgressDialog(mCtx);
-        mProgress.setCancelable(false);
     }
 
     /**
@@ -172,32 +169,68 @@ public class InstagramApi {
         }.start();
     }
 
-//    private void fetchUserName() {
-//
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                Log.i(TAG, "Fetching user info");
-//                int what = WHAT_FINALIZE;
-//                try {
-//                    String url = API_URL + "/users/" + mSession.getId() + "/?access_token=" + mAccessToken;
-//                    String response = getRequest(url);
-//                    System.out.println(response);
-//
-//                    JSONObject jsonObj = (JSONObject) new JSONTokener(response).nextValue();
-//                    String name = jsonObj.getJSONObject("data").getString("full_name");
-//                    String bio = jsonObj.getJSONObject("data").getString("bio");
-//                    Log.i(TAG, "Got name: " + name + ", bio [" + bio + "]");
-//                } catch (Exception ex) {
-//                    what = WHAT_ERROR;
-//                    ex.printStackTrace();
-//                }
-//
-//                mHandler.sendMessage(mHandler.obtainMessage(what, 2, 0));
-//            }
-//        }.start();
-//
-//    }
+    public void fetchNearbyLocations(final float latitude, final float longitude,
+            final OperationCallback<Location[]> callback) {
+
+        new Thread() {
+            @Override
+            public void run() {
+                Log.i(TAG, "Getting access token");
+                try {
+                    String getParams = String.format(LOCATIONS_ENDPOINT_FORMAT, latitude, longitude, mAccessToken);
+                    String url = API_URL + getParams;
+                    String response = getRequest(url);
+
+                    Log.i(TAG, "response " + response);
+                    JSONObject responseJson = (JSONObject) new JSONTokener(response).nextValue();
+
+                    Gson gson = new Gson();
+                    List<Location> locations = new ArrayList<Location>(3);
+                    JSONArray locationsJson = responseJson.getJSONArray("data");
+                    for (int i = 0; i < locationsJson.length(); i++) {
+                        locations.add(gson.fromJson(locationsJson.get(i).toString(), Location.class));
+                    }
+
+                    callback.notifyCompleted(locations.toArray(new Location[locations.size()]));
+                } catch (Exception ex) {
+                    callback.notifyError(ex);
+                    Log.e(TAG, "Error getting access token", ex);
+                }
+
+            }
+        }.start();
+    }
+
+    public void fetchRecentMedia(final String id, final OperationCallback<Media[]> callback) {
+
+        new Thread() {
+            @Override
+            public void run() {
+                Log.i(TAG, "Getting access token");
+                try {
+                    String getParams = String.format(MEDIA_ENDPOINT_FORMAT, id, mAccessToken);
+                    String url = API_URL + getParams;
+                    String response = getRequest(url);
+
+                    Log.i(TAG, "response " + response);
+                    JSONObject responseJson = (JSONObject) new JSONTokener(response).nextValue();
+
+                    Gson gson = new Gson();
+                    List<Media> media = new ArrayList<Media>();
+                    JSONArray mediaJson = responseJson.getJSONArray("data");
+                    for (int i = 0; i < mediaJson.length(); i++) {
+                        media.add(gson.fromJson(mediaJson.get(i).toString(), Media.class));
+                    }
+
+                    callback.notifyCompleted(media.toArray(new Media[media.size()]));
+                } catch (Exception ex) {
+                    callback.notifyError(ex);
+                    Log.e(TAG, "Error getting access token", ex);
+                }
+
+            }
+        }.start();
+    }
 
     /**
      * Reads stream to string.
