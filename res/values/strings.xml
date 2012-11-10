@@ -7,6 +7,9 @@
     <string name="wait_media">Fetching media for selected location...</string>
     <string name="busy_dialog_default_message">Please wait, loading...</string>
 
+    <!-- BaseActivity -->
+    <string name="logout_text">Logout</string>
+
     <!-- Nearby locations -->
     <string name="distance_km">km.</string>
     <string name="gps_title">GPS status</string>

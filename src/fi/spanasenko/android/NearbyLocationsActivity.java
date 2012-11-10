@@ -5,8 +5,10 @@
  */
 package fi.spanasenko.android;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -21,16 +23,19 @@ import fi.spanasenko.android.instagram.OperationCallbackBase;
 import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.model.Location;
 import fi.spanasenko.android.ui.LocationListAdapter;
+import fi.spanasenko.android.utils.LocationBroadcastReceiver;
 import fi.spanasenko.android.utils.UiUtils;
 
 /**
  * NearbyLocationsActivity
  * Screen which shows nearby locations list for Instagram user. Calls authentication if needed.
  */
-public class NearbyLocationsActivity extends BaseActivity {
+public class NearbyLocationsActivity extends BaseActivity implements LocationBroadcastReceiver.LocationChangedListener {
 
     private InstagramApi mInstagram;
     private ListView mLocationList;
+    private BroadcastReceiver mLocationReceiver;
+    private LocationInfo mLastKnownLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,17 @@ public class NearbyLocationsActivity extends BaseActivity {
         mLocationList = (ListView) findViewById(android.R.id.list);
 
         mInstagram = InstagramApi.getInstance(this);
+        mLocationReceiver = new LocationBroadcastReceiver(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Register for location broadcast
+        registerReceiver(mLocationReceiver, new IntentFilter(LocationBroadcastReceiver.ACTION));
+
+        // Check authorization status
         if (!mInstagram.hasAccessToken()) {
             authorize();
         } else {
@@ -48,10 +64,22 @@ public class NearbyLocationsActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Unregister location update receiver
+        unregisterReceiver(mLocationReceiver);
+    }
+
     /**
      * Initiates Instagram authorization.
      */
     private void authorize() {
+        if (isFinishing()) {
+            return;
+        }
+
         showBusyDialog(R.string.wait_access_token);
 
         mInstagram.authorize(new VoidOperationCallback(OperationCallbackBase.DispatchType.MainThread) {
@@ -111,9 +139,11 @@ public class NearbyLocationsActivity extends BaseActivity {
         showBusyDialog(R.string.wait_locations);
 
         // Returns last known location
-        LocationInfo lastKnown = new LocationInfo(getBaseContext());
+        if (mLastKnownLocation == null) {
+            mLastKnownLocation = new LocationInfo(getBaseContext());
+        }
 
-        mInstagram.fetchNearbyLocations(lastKnown.lastLat, lastKnown.lastLong,
+        mInstagram.fetchNearbyLocations(mLastKnownLocation.lastLat, mLastKnownLocation.lastLong,
                 new OperationCallback<Location[]>(OperationCallbackBase.DispatchType.MainThread) {
                     @Override
                     protected void onCompleted(Location[] result) {
@@ -150,4 +180,15 @@ public class NearbyLocationsActivity extends BaseActivity {
         });
     }
 
+    @Override
+    public void onLocationReceived(LocationInfo locationInfo) {
+        LocationInfo oldLocation = mLastKnownLocation;
+        mLastKnownLocation = locationInfo;
+        if (locationInfo.lastAccuracy < oldLocation.lastAccuracy
+                || locationInfo.lastLat != oldLocation.lastLat
+                || locationInfo.lastLong != oldLocation.lastLong) {
+            // Only update if location changed reasonably
+            loadLocations();
+        }
+    }
 }

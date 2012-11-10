@@ -19,19 +19,19 @@ import fi.spanasenko.android.R;
 
 /**
  * ImageLoaderView
- * Class description 
+ * Implementation of the view that contains ProgressBar and ImageView. Used to show loading indicator while downloading
+ * images from remote/local source to ImageView.
  */
 public class ImageLoaderView extends LinearLayout {
 
     private Context mContext;
-    private Drawable mDrawable;
     private ProgressBar mSpinner;
     private ImageView mImage;
     
     /**
      * This is used when creating the view in XML.
-     * @param context
-     * @param attrSet
+     * @param context Parent context.
+     * @param attrSet XML attributes.
      */
     public ImageLoaderView(final Context context, final AttributeSet attrSet) {
         super(context, attrSet);

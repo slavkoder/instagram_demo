@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import com.flurry.android.FlurryAgent;
+import fi.spanasenko.android.instagram.InstagramApi;
 import fi.spanasenko.android.instagram.OperationCallback;
 import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.utils.UiUtils;
@@ -208,5 +212,39 @@ public class BaseActivity extends Activity {
         dismissBusyDialog();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.app_menu, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_logout:
+                logout();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * Logs out user from Instagram and closes application or shows initial screen (depending on the current screen).
+     */
+    private void logout() {
+        InstagramApi.getInstance(this).logout();
+
+        if (this instanceof NearbyLocationsActivity) {
+            // Just close the application
+            finish();
+        } else {
+            // Send the user to the first view cleaning all the activities in the back stack
+            Intent nearbyLocation = new Intent(this, NearbyLocationsActivity.class);
+            nearbyLocation.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(nearbyLocation);
+        }
+    }
 }

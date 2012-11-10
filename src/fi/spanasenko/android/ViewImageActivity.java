@@ -5,7 +5,6 @@
  */
 package fi.spanasenko.android;
 
-import android.app.Activity;
 import android.os.Bundle;
 import fi.spanasenko.android.ui.ImageLoaderView;
 import fi.spanasenko.android.utils.ImageDownloader;
@@ -14,7 +13,7 @@ import fi.spanasenko.android.utils.ImageDownloader;
  * ViewImageActivity
  * The screen that shows a full size image.
  */
-public class ViewImageActivity extends Activity {
+public class ViewImageActivity extends BaseActivity {
 
     public static final String EXTRA_FULL_SIZE_URL = "fi.spanasenko.android.EXTRA_FULL_SIZE_URL";
 
