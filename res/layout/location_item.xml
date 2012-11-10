@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
+        android:layout_below="@id/location_name"
         android:layout_margin="5dp"
         android:textSize="16dp" />
 </RelativeLayout>
