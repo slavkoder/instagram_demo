@@ -1,0 +1,10 @@
+<resources>
+    <!-- Production config -->
+    <!--<string name="maps_api_key"></string>-->
+
+    <!-- Debug config -->
+    <string name="maps_api_key">0lH0rF0LgXkZ90nPfC3uYzyUs30Afsz9FFcW2Eg</string>
+
+    <string name="flurry_api_key">2BCNGBQ4RBJTV934MDXQ</string>
+    <string name="flurry_error_code">general_error</string>
+</resources>

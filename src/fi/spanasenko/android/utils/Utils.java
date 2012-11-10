@@ -5,6 +5,8 @@
  */
 package fi.spanasenko.android.utils;
 
+import com.google.android.maps.GeoPoint;
+
 /**
  * Utils
  * Holds static utility methods used across the application.
@@ -31,6 +33,16 @@ public class Utils {
         float c = (float) (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         float d = EARTH_RADIUS * c;
         return d;
+    }
+
+    /**
+     * Creates GeoPoint object from given latitude and longitude.
+     * @param lat Latitude of the geopoint.
+     * @param lng Longitude of the geopoint.
+     * @return GeoPoint object from given latitude and longitude.
+     */
+    public static GeoPoint getGeoPoint(float lat, float lng) {
+        return new GeoPoint((int)(lat * 1E6), (int)(lng * 1E6));
     }
 
 }

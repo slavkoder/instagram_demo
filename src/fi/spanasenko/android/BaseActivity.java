@@ -2,21 +2,19 @@ package fi.spanasenko.android;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.flurry.android.FlurryAgent;
-import fi.spanasenko.android.instagram.InstagramApi;
 import fi.spanasenko.android.instagram.OperationCallback;
 import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.utils.UiUtils;
+import fi.spanasenko.android.view.IBaseView;
 
-public class BaseActivity extends Activity {
-
-    private static final String FLURRY_API_KEY = "2BCNGBQ4RBJTV934MDXQ";
-    private static final String FLURRY_ERROR_ID = "general_error";
+public class BaseActivity extends Activity implements IBaseView {
 
     private ProgressDialog _busyDialog;
 
@@ -102,7 +100,7 @@ public class BaseActivity extends Activity {
         isDisplayErrorVisible = true;
 
         // Log the error to flurry
-        FlurryAgent.onError(FLURRY_ERROR_ID, e.getMessage(), this.getClass().getSimpleName());
+        FlurryAgent.onError(getString(R.string.flurry_error_code), e.getMessage(), this.getClass().getSimpleName());
     }
 
     public void notifyUser(int titleId, int messageId) {
@@ -183,12 +181,17 @@ public class BaseActivity extends Activity {
     }
 
     @Override
+    public int getIntResource(int resourceId) {
+        return getIntResource(resourceId);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
         // Note that since we have permissions to access location, Flurry will automatically gather user location data.
         // FlurryAgent.setReportLocation(false);
-        FlurryAgent.onStartSession(this, FLURRY_API_KEY);
+        FlurryAgent.onStartSession(this, getString(R.string.flurry_api_key));
     }
 
     @Override
@@ -231,12 +234,8 @@ public class BaseActivity extends Activity {
         }
     }
 
-    /**
-     * Logs out user from Instagram and closes application or shows initial screen (depending on the current screen).
-     */
-    private void logout() {
-        InstagramApi.getInstance(this).logout();
-
+    @Override
+    public void logout() {
         if (this instanceof NearbyLocationsActivity) {
             // Just close the application
             finish();
@@ -247,4 +246,10 @@ public class BaseActivity extends Activity {
             startActivity(nearbyLocation);
         }
     }
+
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
 }
