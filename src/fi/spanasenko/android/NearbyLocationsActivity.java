@@ -32,6 +32,7 @@ public class NearbyLocationsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.login_screen);
 
         mLocationList = (ListView) findViewById(android.R.id.list);

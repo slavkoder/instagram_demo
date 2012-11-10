@@ -6,6 +6,7 @@
 package fi.spanasenko.android;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,6 +26,9 @@ import fi.spanasenko.android.utils.UiUtils;
 public class ImageGalleryActivity extends BaseActivity {
 
     public static final String EXTRA_LOCATION_ID = "fi.spanasenko.android.EXTRA_LOCATION_ID";
+
+    private static final int NUM_COLUMNS_PORTRAIT = 3;
+    private static final int NUM_COLUMNS_LANDSCAPE = 5;
 
     private GridView mGridView;
     private InstagramApi mInstagram;
@@ -101,6 +105,17 @@ public class ImageGalleryActivity extends BaseActivity {
                 }
             });
 
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mGridView.setNumColumns(NUM_COLUMNS_LANDSCAPE);
+        } else {
+            mGridView.setNumColumns(NUM_COLUMNS_PORTRAIT);
         }
     }
 }

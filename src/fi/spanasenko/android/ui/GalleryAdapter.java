@@ -6,12 +6,12 @@
 package fi.spanasenko.android.ui;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
-import fi.spanasenko.android.R;
+import fi.spanasenko.android.model.Images;
 import fi.spanasenko.android.model.Media;
 import fi.spanasenko.android.utils.ImageDownloader;
 
@@ -22,17 +22,17 @@ import fi.spanasenko.android.utils.ImageDownloader;
 public class GalleryAdapter extends BaseAdapter {
 
     private Media[] mMedia;
-    private LayoutInflater mInflater;
+    private Context mContext;
     private ImageDownloader mImageDownloader;
 
     /**
      * Constructor.
      * @param ctx Parent context.
-     * @param locations Locations array to be displayed with this adapter.
+     * @param pictures Pictures array to be displayed with this adapter.
      */
-    public GalleryAdapter(Context ctx, Media[] locations) {
-        mMedia = locations;
-        mInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    public GalleryAdapter(Context ctx, Media[] pictures) {
+        mMedia = pictures;
+        mContext = ctx;
         mImageDownloader = new ImageDownloader(ctx);
     }
 
@@ -61,16 +61,28 @@ public class GalleryAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ImageView image;
+        Images.Image thumbnail = ((Media) getItem(i)).getImages().getThumbnail();
+
+        ViewHolder holder;
         if (view == null) {
-            image = (ImageView) mInflater.inflate(R.layout.media_item, viewGroup, false);
-        } else {
-            image = (ImageView) view;
+            view = new ImageLoaderView(mContext);
+            view.setLayoutParams(new GridView.LayoutParams(thumbnail.getWidth(), thumbnail.getWidth()));
+            ((ImageLoaderView) view).getImageView().setScaleType(ImageView.ScaleType.FIT_XY);
+
+            holder = new ViewHolder();
+            holder.image = (ImageLoaderView) view;
+            view.setTag(holder);
+        }
+        else {
+            holder = (ViewHolder) view.getTag();
         }
 
-        Media currentItem = (Media) getItem(i);
-        mImageDownloader.download(currentItem.getImages().getThumbnail().getUrl(), image, 0);
+        mImageDownloader.download(thumbnail.getUrl(), holder.image, 0);
 
-        return image;
+        return view;
+    }
+
+    private static class ViewHolder {
+        public ImageLoaderView image;
     }
 }

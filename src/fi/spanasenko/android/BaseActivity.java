@@ -4,11 +4,15 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import com.flurry.android.FlurryAgent;
 import fi.spanasenko.android.instagram.OperationCallback;
 import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.utils.UiUtils;
 
 public class BaseActivity extends Activity {
+
+    private static final String FLURRY_API_KEY = "2BCNGBQ4RBJTV934MDXQ";
+    private static final String FLURRY_ERROR_ID = "general_error";
 
     private ProgressDialog _busyDialog;
 
@@ -93,7 +97,8 @@ public class BaseActivity extends Activity {
         UiUtils.displayError(this, e, cb);
         isDisplayErrorVisible = true;
 
-        // TODO: log to FlurryAnalytics
+        // Log the error to flurry
+        FlurryAgent.onError(FLURRY_ERROR_ID, e.getMessage(), this.getClass().getSimpleName());
     }
 
     public void notifyUser(int titleId, int messageId) {
@@ -171,14 +176,16 @@ public class BaseActivity extends Activity {
     protected void onStart() {
         super.onStart();
 
-        // TODO: FlurryAgent.onStartSession(this, "");
+        // Note that since we have permissions to access location, Flurry will automatically gather user location data.
+        // FlurryAgent.setReportLocation(false);
+        FlurryAgent.onStartSession(this, FLURRY_API_KEY);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        // TODO: FlurryAgent.onEndSession(this);
+        FlurryAgent.onEndSession(this);
     }
 
     @Override

@@ -17,7 +17,6 @@
 package fi.spanasenko.android.utils;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -25,8 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.ImageView;
-import fi.spanasenko.android.R;
+import fi.spanasenko.android.ui.ImageLoaderView;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -54,19 +52,9 @@ public class ImageDownloader {
 
     private static final String TAG = ImageDownloader.class.getSimpleName();
 
-    private final Context mContext;
-    private final Bitmap mLoadingIndicator;
-    private final Bitmap mErrorIndicator;
-
     private ExternalCache mExternalCache;
 
     public ImageDownloader(Context appContext) {
-        mContext = appContext;
-        mLoadingIndicator = ((BitmapDrawable) appContext.getResources()
-                .getDrawable(R.drawable.ic_loading)).getBitmap();
-        mErrorIndicator = ((BitmapDrawable) appContext.getResources()
-                .getDrawable(R.drawable.ic_error)).getBitmap();
-
         mExternalCache = new ExternalCache(appContext);
     }
 
@@ -75,15 +63,16 @@ public class ImageDownloader {
      * binding is immediate if the image is found in the cache and will be done asynchronously
      * otherwise. A null bitmap will be associated to the ImageView if an error occurs.
      * @param url The URL of the image to download.
-     * @param imageView The ImageView to bind the downloaded image to.
+     * @param imageView The ImageLoaderView to bind the downloaded image to.
      */
-    public void download(String url, ImageView imageView, int cornersRadius) {
+    public void download(String url, ImageLoaderView imageView, int cornersRadius) {
         resetPurgeTimer();
 
         // Get image from hash map if it is there
         Bitmap bitmap = getBitmapFromCache(url);
 
         if (bitmap == null) {
+            imageView.startLoading();
             File file = mExternalCache.checkExternalCache(url);
             if (file != null) {
                 // Image is in external cache          
@@ -95,7 +84,7 @@ public class ImageDownloader {
         } else {
             // Image is in hash map
             cancelPotentialDownload(url, imageView);
-            imageView.setImageBitmap(bitmap);
+            imageView.setImageBitmap(bitmap, true);
         }
     }
 
@@ -103,19 +92,18 @@ public class ImageDownloader {
      * Same as download but the image is always downloaded and the cache is not used.
      * Kept private at the moment as its interest is not clear.
      */
-    private void forceDownload(String url, ImageView imageView, int cornersRadius) {
+    private void forceDownload(String url, ImageLoaderView imageView, int cornersRadius) {
         // State sanity: url is guaranteed to never be null in
         // DownloadedDrawable and cache keys.
         if (url == null || url.equals("")) {
-            imageView.setImageDrawable(null);
+            imageView.setImageDrawable(null, false);
             return;
         }
 
         if (cancelPotentialDownload(url, imageView)) {
             BitmapDownloaderTask task = new BitmapDownloaderTask(imageView, cornersRadius);
-            DownloadedDrawable downloadedDrawable = new DownloadedDrawable(
-                    imageView.getResources(), mLoadingIndicator, task);
-            imageView.setImageDrawable(downloadedDrawable);
+            DownloadedDrawable downloadedDrawable = new DownloadedDrawable(null, task);
+            imageView.setImageDrawable(downloadedDrawable, false);
             imageView.setMinimumHeight(156);
             task.execute(url);
         }
@@ -127,7 +115,7 @@ public class ImageDownloader {
      * Returns false if the download in progress deals with the same url. The download is not
      * stopped in that case.
      */
-    private static boolean cancelPotentialDownload(String url, ImageView imageView) {
+    private static boolean cancelPotentialDownload(String url, ImageLoaderView imageView) {
         BitmapDownloaderTask bitmapDownloaderTask = getBitmapDownloaderTask(imageView);
 
         if (bitmapDownloaderTask != null) {
@@ -139,22 +127,24 @@ public class ImageDownloader {
                 return false;
             }
         }
+
         return true;
     }
 
     /**
-     * @param imageView Any imageView
+     * @param imageView Any ImageLoaderView.
      * @return Retrieve the currently active download task (if any) associated with this imageView.
      *         null if there is no such task.
      */
-    private static BitmapDownloaderTask getBitmapDownloaderTask(ImageView imageView) {
+    private static BitmapDownloaderTask getBitmapDownloaderTask(ImageLoaderView imageView) {
         if (imageView != null) {
-            Drawable drawable = imageView.getDrawable();
+            Drawable drawable = imageView.getImageView().getDrawable();
             if (drawable instanceof DownloadedDrawable) {
                 DownloadedDrawable downloadedDrawable = (DownloadedDrawable) drawable;
                 return downloadedDrawable.getBitmapDownloaderTask();
             }
         }
+
         return null;
     }
 
@@ -243,11 +233,11 @@ public class ImageDownloader {
     class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 
         private String url;
-        private final WeakReference<ImageView> imageViewReference;
+        private final WeakReference<ImageLoaderView> imageViewReference;
         private final int mRoundCorners;
 
-        public BitmapDownloaderTask(ImageView imageView, int roundCorners) {
-            imageViewReference = new WeakReference<ImageView>(imageView);
+        public BitmapDownloaderTask(ImageLoaderView imageView, int roundCorners) {
+            imageViewReference = new WeakReference<ImageLoaderView>(imageView);
             mRoundCorners = roundCorners;
         }
 
@@ -267,27 +257,23 @@ public class ImageDownloader {
         protected void onPostExecute(Bitmap bitmap) {
             if (isCancelled() || bitmap == null) {
                 // Set the error default avatar image
-                if (imageViewReference != null) {
-                    ImageView imageView = imageViewReference.get();
-                    imageView.setImageBitmap(mErrorIndicator);
-                }
                 return;
             }
 
-            Bitmap result = bitmap;//ImageUtilities.getRoundedCornerBitmap(bitmap, mRoundCorners);
+            Bitmap result = bitmap; //ImageUtilities.getRoundedCornerBitmap(bitmap, mRoundCorners);
             addBitmapToCache(url, result);
 
             // Add the bitmap to the external cache as well
             mExternalCache.addBitmapToExternalCache(url, result);
 
             if (imageViewReference != null) {
-                ImageView imageView = imageViewReference.get();
+                ImageLoaderView imageView = imageViewReference.get();
                 BitmapDownloaderTask bitmapDownloaderTask = getBitmapDownloaderTask(imageView);
                 // Change bitmap only if this process is still associated with it
                 // Or if we don't use any bitmap to task association (NO_DOWNLOADED_DRAWABLE mode)
                 if (this == bitmapDownloaderTask) {
                     // Set the avatar image
-                    imageView.setImageBitmap(result);
+                    imageView.setImageBitmap(result, true);
                 }
             }
 
@@ -305,9 +291,9 @@ public class ImageDownloader {
 
         private final WeakReference<BitmapDownloaderTask> bitmapDownloaderTaskReference;
 
-        public DownloadedDrawable(Resources res, Bitmap placeHolder,
+        public DownloadedDrawable(Bitmap placeHolder,
                 BitmapDownloaderTask bitmapDownloaderTask) {
-            super(res, placeHolder);
+            super(placeHolder);
 
             bitmapDownloaderTaskReference =
                     new WeakReference<BitmapDownloaderTask>(bitmapDownloaderTask);
@@ -416,11 +402,10 @@ public class ImageDownloader {
         purgeHandler.postDelayed(purger, DELAY_BEFORE_PURGE);
     }
 
-    private void externalDownload(String url, ImageView imageView, int cornersRadius, File file) {
+    private void externalDownload(String url, ImageLoaderView imageView, int cornersRadius, File file) {
         ExternalDownloaderTask task =
                 new ExternalDownloaderTask(imageView, cornersRadius, url);
         task.execute(file.toString());
-        imageView.setImageBitmap(mLoadingIndicator);
     }
 
     /**
@@ -429,12 +414,12 @@ public class ImageDownloader {
     class ExternalDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 
         private String file;
-        private final WeakReference<ImageView> imageViewReference;
+        private final WeakReference<ImageLoaderView> imageViewReference;
         private final int mRoundCorners;
         private final String mUrl;
 
-        public ExternalDownloaderTask(ImageView imageView, int roundCorners, String url) {
-            imageViewReference = new WeakReference<ImageView>(imageView);
+        public ExternalDownloaderTask(ImageLoaderView imageView, int roundCorners, String url) {
+            imageViewReference = new WeakReference<ImageLoaderView>(imageView);
             mRoundCorners = roundCorners;
             mUrl = url;
         }
@@ -455,21 +440,16 @@ public class ImageDownloader {
         protected void onPostExecute(Bitmap bitmap) {
 
             if (bitmap == null) {
-                // Set the error default avatar image
-                if (imageViewReference != null) {
-                    ImageView imageView = imageViewReference.get();
-                    imageView.setImageBitmap(mErrorIndicator);
-                }
                 return;
             }
 
             addBitmapToCache(mUrl, bitmap);
 
             if (imageViewReference != null) {
-                ImageView imageView = imageViewReference.get();
+                ImageLoaderView imageView = imageViewReference.get();
                 if (imageView != null) {
                     // Set the avatar image
-                    imageView.setImageBitmap(bitmap);
+                    imageView.setImageBitmap(bitmap, true);
                 }
             }
         }
