@@ -9,6 +9,8 @@
 
     <!-- Nearby locations -->
     <string name="distance_km">km.</string>
+    <string name="gps_title">GPS status</string>
+    <string name="gps_message">To improve your location it\'s recommended to use GPS. Would you like to turn on GPS now?</string>
 
     <!-- Image Gallery Activity -->
     <string name="no_media_title">No media found</string>

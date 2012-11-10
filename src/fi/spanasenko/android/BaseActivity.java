@@ -163,6 +163,12 @@ public class BaseActivity extends Activity {
         busyDialogMessage = null;
     }
 
+    public void promptUser(int titleId, int messageId, int positiveButtonId, int negativeButtonId,
+            final OperationCallback<String> callback) {
+        UiUtils.promptUser(this, titleId, messageId, getString(positiveButtonId), getString(negativeButtonId),
+                callback);
+    }
+
     public void promptUser(String title, String message, final String positiveButton, final String negativeButton,
                            final OperationCallback<String> callback) {
         UiUtils.promptUser(this, title, message, positiveButton, negativeButton, callback);
