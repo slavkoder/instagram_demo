@@ -8,8 +8,6 @@ import fi.spanasenko.android.view.IBaseView;
  */
 public interface IBasePresenter<T extends IBaseView>
 {
-	public void logout();
-
 
 	/**
 	 * Performs any initialization activities that the presenter needs to do

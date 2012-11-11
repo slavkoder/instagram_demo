@@ -32,7 +32,6 @@ public class InstagramApi {
     private String mAuthUrl;
     private String mTokenUrl;
     private String mAccessToken;
-    private Context mCtx;
 
     // Instagram API endpoints
     private static final String AUTH_URL = "https://api.instagram.com/oauth/authorize/";
@@ -51,8 +50,6 @@ public class InstagramApi {
      * @param context Parent context.
      */
     private InstagramApi(Context context) {
-
-        mCtx = context;
         mSession = UserSettings.getInstance(context);
         mAccessToken = mSession.getAccessToken();
 
@@ -93,7 +90,7 @@ public class InstagramApi {
         return (mAccessToken == null) ? false : true;
     }
 
-    public void authorize(final VoidOperationCallback callback) {
+    public void authorize(Context context, final VoidOperationCallback callback) {
         InstagramDialog.OAuthDialogListener listener = new InstagramDialog.OAuthDialogListener() {
             @Override
             public void onComplete(String code) {
@@ -121,7 +118,7 @@ public class InstagramApi {
             }
         };
 
-        InstagramDialog dialog = new InstagramDialog(mCtx, mAuthUrl, listener);
+        InstagramDialog dialog = new InstagramDialog(context, mAuthUrl, listener);
         dialog.show();
     }
 

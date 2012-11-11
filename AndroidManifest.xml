@@ -21,13 +21,22 @@
 
         <uses-library android:name="com.google.android.maps"/>
 
+        <!-- Login Activity -->
+        <activity android:name=".LoginActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
         <!-- NearbyLocationsActivity -->
         <activity android:name=".NearbyLocationsActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Light">
-
-        </activity>
+            android:theme="@android:style/Theme.Light" />
 
         <!-- ImageGalleryActivity -->
         <activity android:name=".ImageGalleryActivity"
@@ -44,12 +53,8 @@
         <!-- LocationMapActivity -->
         <activity android:name=".LocationsMapActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Light.NoTitleBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+            android:configChanges="orientation"
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
 
         <!-- Little Fluffy Location Library -->
         <service android:name="com.littlefluffytoys.littlefluffylocationlibrary.LocationBroadcastService"/>

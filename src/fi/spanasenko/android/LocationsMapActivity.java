@@ -7,16 +7,26 @@ package fi.spanasenko.android;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import com.flurry.android.FlurryAgent;
 import com.google.android.maps.*;
+import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
+import com.readystatesoftware.maps.OnSingleTapListener;
+import com.readystatesoftware.maps.TapControlledMapView;
 import fi.spanasenko.android.instagram.OperationCallback;
 import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.model.Location;
 import fi.spanasenko.android.presenter.NearbyLocationPresenter;
+import fi.spanasenko.android.ui.LocationOverlayItem;
 import fi.spanasenko.android.ui.LocationsOverlay;
 import fi.spanasenko.android.utils.UiUtils;
+import fi.spanasenko.android.utils.UserSettings;
 import fi.spanasenko.android.utils.Utils;
 import fi.spanasenko.android.view.INearbyLocationsView;
 
@@ -24,12 +34,16 @@ import java.util.List;
 
 /**
  * LocationsMapActivity
- * Class description
+ * Screen with Instagram locations showed as pins. Taping a pin shows balloon, taping balloon shows photos for selected
+ * location.
  */
 public class LocationsMapActivity extends MapActivity implements INearbyLocationsView {
 
     private NearbyLocationPresenter mPresenter;
-    private MapView mMapView;
+    private TapControlledMapView mMapView;
+    private List<Overlay> mMapOverlays;
+    private LocationsOverlay mItemizedOverlay;
+    private MyLocationOverlay mMyLocationOverlay;
 
     // Ugly copypaste from BaseActivity
     private ProgressDialog _busyDialog;
@@ -52,39 +66,89 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
     private static final String DISPLAY_ERROR_VISIBLE_INSTANCE_STATE_KEY = "isDisplayErrorVisible";
     private static final String DISPLAY_ERROR_EXCEPTION_INSTANCE_STATE_KEY = "displayErrorException";
 
+    private static final String SELECTED_OVERLAY_ITEM_INDEX = "overlay_item_index";
+    private static final int DEFAULT_ZOOM_LEVEL = 16;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.location_map);
+        setContentView(R.layout.locations_map_screen);
 
-        mMapView = (MapView) findViewById(R.id.map_view);
+        if (!UserSettings.getInstance(this).isMapPrefered()) {
+            // Show list activity immediately
+            startActivity(new Intent(this, NearbyLocationsActivity.class));
+            finish();
+            return;
+        }
+
+        mMapView = (TapControlledMapView) findViewById(R.id.map_view);
         mMapView.setBuiltInZoomControls(true);
 
+        mMapOverlays = mMapView.getOverlays();
+
+        // dismiss balloon upon single tap of MapView (iOS behavior)
+        mMapView.setOnSingleTapListener(new OnSingleTapListener() {
+            @Override
+            public boolean onSingleTap(MotionEvent e) {
+                if (mItemizedOverlay != null) {
+                    mItemizedOverlay.hideAllBalloons();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
         mPresenter = new NearbyLocationPresenter(this);
+
+        Drawable drawable = this.getResources().getDrawable(R.drawable.map_marker);
+        mItemizedOverlay = new LocationsOverlay(drawable, mMapView, mPresenter);
+        mItemizedOverlay.setBalloonBottomOffset(drawable.getMinimumHeight());
+        mItemizedOverlay.setShowClose(false);
+        mItemizedOverlay.setShowDisclosure(true);
+
+        mMyLocationOverlay = new MyLocationOverlay(this, mMapView);
+        mMyLocationOverlay.enableMyLocation();
+        mMapOverlays.add(mMyLocationOverlay);
+
+        if (savedInstanceState == null) {
+            final MapController mc = mMapView.getController();
+
+            GeoPoint myLocation = mMyLocationOverlay.getMyLocation();
+            if (myLocation == null) {
+                LocationInfo lastKnown = mPresenter.getLastKnownLocation();
+                myLocation = Utils.getGeoPoint(lastKnown.lastLat, lastKnown.lastLong);
+            }
+
+            mc.animateTo(myLocation);
+            mc.setZoom(DEFAULT_ZOOM_LEVEL);
+        }
+
+        mPresenter.loadLocations();
     }
 
     @Override
     public void updateLocations(Location[] locations) {
-        List<Overlay> mapOverlays = mMapView.getOverlays();
-        Drawable drawable = this.getResources().getDrawable(R.drawable.map_marker);
+        mItemizedOverlay.clearOverlays();
 
-        LocationsOverlay itemizedoverlay = new LocationsOverlay(drawable, mMapView);
-
-        for (Location loc:locations) {
-            GeoPoint point = Utils.getGeoPoint(loc.getLatitude(), loc.getLongitude());
-            OverlayItem overlayitem = new OverlayItem(point, loc.getName(), "");
-            itemizedoverlay.addOverlay(overlayitem);
+        for (Location loc : locations) {
+            mItemizedOverlay.addOverlay(new LocationOverlayItem(loc));
         }
 
-        mapOverlays.add(itemizedoverlay);
+        mMapOverlays.add(mItemizedOverlay);
+        mMapView.invalidate();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        // This is an ugly hack to prevent back stack from staying after logout.
+        if (InstagramDemoApp.getInstance(this).isLoggingOut()) {
+            finish();
+        }
+
         mPresenter.registerObserver();
-        mPresenter.checkAuthorizationAndLoadLocations();
     }
 
     @Override
@@ -92,6 +156,36 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
         super.onPause();
 
         mPresenter.unregisterObserver();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.map_screen_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_logout: {
+                BaseActivity.logout(this);
+                return true;
+            }
+            case R.id.menu_show_list: {
+                // Save user view preference
+                UserSettings.getInstance(this).setIsMapPrefered(false);
+
+                // Show list view
+                Intent showList = new Intent(this, NearbyLocationsActivity.class);
+                startActivity(showList);
+                finish();
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -125,6 +219,11 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
         state.putString(NOTIFY_USER_MESSAGE_INSTANCE_STATE_KEY, notifyUserMessage);
         state.putBoolean(DISPLAY_ERROR_VISIBLE_INSTANCE_STATE_KEY, isDisplayErrorVisible);
         state.putSerializable(DISPLAY_ERROR_EXCEPTION_INSTANCE_STATE_KEY, displayErrorException);
+
+        // example saving focused state of overlays
+        if (mItemizedOverlay != null && mItemizedOverlay.getFocus() != null) {
+            state.putInt(SELECTED_OVERLAY_ITEM_INDEX, mItemizedOverlay.getLastFocusedIndex());
+        }
     }
 
     @Override
@@ -147,6 +246,13 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
 
         if (isDisplayErrorVisible) {
             onError(displayErrorException);
+        }
+
+        if (mItemizedOverlay != null) {
+            int focused = state.getInt(SELECTED_OVERLAY_ITEM_INDEX, -1);
+            if (focused >= 0 && focused < mItemizedOverlay.size()) {
+                mItemizedOverlay.setFocus(mItemizedOverlay.getItem(focused));
+            }
         }
     }
 
@@ -240,6 +346,7 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
             } catch (IllegalArgumentException err) {
             }
         }
+
         isBusyDialogVisible = false;
         busyDialogMessage = null;
     }
@@ -268,13 +375,8 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
     }
 
     @Override
-    public void logout() {
-        // Just close the application
-        finish();
-    }
-
-    @Override
     public Context getContext() {
         return this;
     }
+
 }

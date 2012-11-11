@@ -36,11 +36,6 @@ public interface IBaseView
 	ComponentName startService(Intent i);
 
     /**
-     * Logs out user from Instagram and closes application or shows initial screen (depending on the current screen).
-     */
-    void logout();
-
-    /**
      * Returns current activity context.
      * @return Current activity context.
      */

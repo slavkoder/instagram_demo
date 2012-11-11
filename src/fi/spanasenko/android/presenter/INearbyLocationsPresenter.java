@@ -5,6 +5,7 @@
  */
 package fi.spanasenko.android.presenter;
 
+import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
 import fi.spanasenko.android.model.Location;
 import fi.spanasenko.android.view.INearbyLocationsView;
 
@@ -13,21 +14,6 @@ import fi.spanasenko.android.view.INearbyLocationsView;
  * Class description
  */
 public interface INearbyLocationsPresenter extends IBasePresenter<INearbyLocationsView> {
-
-    /**
-     *
-     */
-    void checkAuthorizationAndLoadLocations();
-
-    /**
-     * Checks gps status and prompt a user to turn it on if not. When checked starts location update.
-     */
-    void checkGpsStatusAndFetchLocations();
-
-    /**
-     * Initiates Instagram authorization.
-     */
-    void authorize();
 
     /**
      * Initiates loading locations from Instagram.
@@ -49,5 +35,11 @@ public interface INearbyLocationsPresenter extends IBasePresenter<INearbyLocatio
      * @param location Selected location.
      */
     void openLocation(Location location);
+
+    /**
+     * Returns last known location info.
+     * @return last known location info.
+     */
+    LocationInfo getLastKnownLocation();
 
 }

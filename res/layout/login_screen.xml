@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-
-    <ListView android:id="@android:id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
-
-</LinearLayout>
+    android:layout_height="fill_parent"
+    android:background="#4B789D">
+    <Button android:id="@+id/btn_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="10dp"
+        android:onClick="onLoginClicked"
+        android:text="@string/btn_login_text" />
+    <ImageView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btn_login"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:src="@drawable/instagram_logo" />
+</RelativeLayout>

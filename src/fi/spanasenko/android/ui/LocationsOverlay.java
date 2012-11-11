@@ -7,7 +7,9 @@ package fi.spanasenko.android.ui;
 
 import android.graphics.drawable.Drawable;
 import com.google.android.maps.MapView;
-import com.google.android.maps.OverlayItem;
+import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
+import fi.spanasenko.android.model.Location;
+import fi.spanasenko.android.presenter.NearbyLocationPresenter;
 
 import java.util.ArrayList;
 
@@ -15,16 +17,19 @@ import java.util.ArrayList;
  * LocationsOverlay
  * Class description
  */
-public class LocationsOverlay extends BalloonItemizedOverlay<OverlayItem> {
+public class LocationsOverlay extends BalloonItemizedOverlay<LocationOverlayItem> {
 
-    private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
+    private ArrayList<LocationOverlayItem> mOverlays = new ArrayList<LocationOverlayItem>();
 
-    public LocationsOverlay(Drawable drawable, MapView mapView) {
+    private NearbyLocationPresenter mPresenter;
+
+    public LocationsOverlay(Drawable drawable, MapView mapView, NearbyLocationPresenter presenter) {
         super(boundCenterBottom(drawable), mapView);
+        mPresenter = presenter;
     }
 
     @Override
-    protected OverlayItem createItem(int i) {
+    protected LocationOverlayItem createItem(int i) {
         return mOverlays.get(i);
     }
 
@@ -33,9 +38,26 @@ public class LocationsOverlay extends BalloonItemizedOverlay<OverlayItem> {
         return mOverlays.size();
     }
 
-    public void addOverlay(OverlayItem overlay) {
+    /**
+     * Adds overlay item.
+     * @param overlay Location overlay item.
+     */
+    public void addOverlay(LocationOverlayItem overlay) {
         mOverlays.add(overlay);
         populate();
     }
 
+    /**
+     * Removes all current overlays from storage.
+     */
+    public void clearOverlays() {
+        mOverlays.clear();
+    }
+
+    @Override
+    protected boolean onBalloonTap(int index, LocationOverlayItem item) {
+        Location selectedLocation = item.getLocation();
+        mPresenter.openLocation(selectedLocation);
+        return true;
+    }
 }

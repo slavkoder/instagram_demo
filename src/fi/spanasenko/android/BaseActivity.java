@@ -28,6 +28,8 @@ public class BaseActivity extends Activity implements IBaseView {
 
     protected Exception displayErrorException;
 
+    public static final String EXTRA_LOGOUT = "fi.spanasenko.android.EXTRA_LOGOUT";
+
     private static final String BUSY_DIALOG_VISIBLE_INSTANCE_STATE_KEY = "isBusyDialogVisible";
     private static final String BUSY_DIALOG_MESSAGE_INSTANCE_STATE_KEY = "busyDialogMessage";
     private static final String NOTIFY_USER_VISIBLE_INSTANCE_STATE_KEY = "isNotifyUserVisible";
@@ -73,6 +75,16 @@ public class BaseActivity extends Activity implements IBaseView {
 
         if (isDisplayErrorVisible) {
             onError(displayErrorException);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // This is an ugly hack to prevent back stack from staying after logout.
+        if (InstagramDemoApp.getInstance(this).isLoggingOut() && !(this instanceof LoginActivity)) {
+            finish();
         }
     }
 
@@ -172,7 +184,7 @@ public class BaseActivity extends Activity implements IBaseView {
     }
 
     public void promptUser(String title, String message, final String positiveButton, final String negativeButton,
-                           final OperationCallback<String> callback) {
+            final OperationCallback<String> callback) {
         UiUtils.promptUser(this, title, message, positiveButton, negativeButton, callback);
     }
 
@@ -227,24 +239,26 @@ public class BaseActivity extends Activity implements IBaseView {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_logout:
-                logout();
+                logout(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    @Override
-    public void logout() {
-        if (this instanceof NearbyLocationsActivity) {
-            // Just close the application
-            finish();
-        } else {
-            // Send the user to the first view cleaning all the activities in the back stack
-            Intent nearbyLocation = new Intent(this, NearbyLocationsActivity.class);
-            nearbyLocation.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(nearbyLocation);
-        }
+    /**
+     * Logs out user from Instagram using current activity as refering point.
+     * @param activity User's current activity.
+     */
+    public static void logout(Activity activity) {
+        // Send the user to the first view cleaning all the activities in the back stack
+        Intent login = new Intent(activity, LoginActivity.class);
+        login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        login.putExtra(EXTRA_LOGOUT, true);
+        activity.startActivity(login);
+
+        // This is an ugly hack to prevent back stack from staying after logout.
+        InstagramDemoApp.getInstance(activity).setLoggingOut(true);
     }
 
     @Override

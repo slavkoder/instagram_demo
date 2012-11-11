@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
+import com.littlefluffytoys.littlefluffylocationlibrary.LocationLibraryConstants;
 
 /**
  * LocationBroadcastReceiver
@@ -18,7 +19,6 @@ import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
 public class LocationBroadcastReceiver extends BroadcastReceiver {
 
     public static final String ACTION = "fi.spanasenko.android.littlefluffylocationlibrary.LOCATION_CHANGED";
-    private static final String EXTRA_LOCATION = "com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo";
 
     private LocationChangedListener mListener;
 
@@ -33,8 +33,9 @@ public class LocationBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extra = intent.getExtras();
-        if (extra != null && extra.containsKey(EXTRA_LOCATION)) {
-            mListener.onLocationReceived((LocationInfo) extra.getSerializable(EXTRA_LOCATION));
+        if (extra != null && extra.containsKey(LocationLibraryConstants.LOCATION_BROADCAST_EXTRA_LOCATIONINFO)) {
+            mListener.onLocationReceived((LocationInfo) extra.getSerializable(
+                    LocationLibraryConstants.LOCATION_BROADCAST_EXTRA_LOCATIONINFO));
         }
     }
 

@@ -7,8 +7,13 @@
     <string name="wait_media">Fetching media for selected location...</string>
     <string name="busy_dialog_default_message">Please wait, loading...</string>
 
-    <!-- BaseActivity -->
+    <!-- Menus -->
     <string name="logout_text">Logout</string>
+    <string name="show_map_text">Switch to map view</string>
+    <string name="show_list_text">Switch to list view</string>
+
+    <!-- LoginActivity -->
+    <string name="btn_login_text">Login with Instagram</string>
 
     <!-- Nearby locations -->
     <string name="distance_km">km.</string>

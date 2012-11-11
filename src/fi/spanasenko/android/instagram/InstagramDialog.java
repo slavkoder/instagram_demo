@@ -102,7 +102,13 @@ public class InstagramDialog extends Dialog {
 		mContent.addView(mWebView);
 	}
 
-	private class OAuthWebViewClient extends WebViewClient {
+    @Override
+    public void onBackPressed() {
+        mListener.onError("Cancelled");
+        super.onBackPressed();
+    }
+
+    private class OAuthWebViewClient extends WebViewClient {
 
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {

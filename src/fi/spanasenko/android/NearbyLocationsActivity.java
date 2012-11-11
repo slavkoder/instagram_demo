@@ -5,7 +5,11 @@
  */
 package fi.spanasenko.android;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -13,6 +17,7 @@ import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
 import fi.spanasenko.android.model.Location;
 import fi.spanasenko.android.presenter.NearbyLocationPresenter;
 import fi.spanasenko.android.ui.LocationListAdapter;
+import fi.spanasenko.android.utils.UserSettings;
 import fi.spanasenko.android.view.INearbyLocationsView;
 
 /**
@@ -29,10 +34,12 @@ public class NearbyLocationsActivity extends BaseActivity implements INearbyLoca
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.login_screen);
+        setContentView(R.layout.locations_list_screen);
 
         mLocationList = (ListView) findViewById(android.R.id.list);
         mPresenter = new NearbyLocationPresenter(this);
+
+        mPresenter.loadLocations();
     }
 
     @Override
@@ -40,7 +47,6 @@ public class NearbyLocationsActivity extends BaseActivity implements INearbyLoca
         super.onResume();
 
         mPresenter.registerObserver();
-        mPresenter.checkAuthorizationAndLoadLocations();
     }
 
     @Override
@@ -48,6 +54,32 @@ public class NearbyLocationsActivity extends BaseActivity implements INearbyLoca
         super.onPause();
 
         mPresenter.unregisterObserver();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.list_screen_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_show_map: {
+                // Save user view preference
+                UserSettings.getInstance(this).setIsMapPrefered(true);
+
+                // Show list view
+                Intent showMap = new Intent(this, LocationsMapActivity.class);
+                startActivity(showMap);
+                finish();
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

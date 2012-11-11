@@ -6,20 +6,18 @@
 package fi.spanasenko.android.presenter;
 
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.LocationManager;
-import android.provider.Settings;
 import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
+import com.littlefluffytoys.littlefluffylocationlibrary.LocationLibraryConstants;
 import fi.spanasenko.android.ImageGalleryActivity;
 import fi.spanasenko.android.R;
 import fi.spanasenko.android.instagram.InstagramApi;
 import fi.spanasenko.android.instagram.OperationCallback;
 import fi.spanasenko.android.instagram.OperationCallbackBase;
-import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.model.Location;
 import fi.spanasenko.android.utils.LocationBroadcastReceiver;
+import fi.spanasenko.android.utils.Utils;
 import fi.spanasenko.android.view.INearbyLocationsView;
 
 /**
@@ -42,67 +40,6 @@ public class NearbyLocationPresenter extends PresenterBase<INearbyLocationsView>
 
         mInstagram = InstagramApi.getInstance(getContext());
         mLocationReceiver = new LocationBroadcastReceiver(this);
-    }
-
-    @Override
-    public void checkAuthorizationAndLoadLocations() {
-        // Check authorization status
-        if (!mInstagram.hasAccessToken()) {
-            authorize();
-        } else {
-            loadLocations();
-        }
-    }
-
-    @Override
-    public void authorize() {
-        getView().showBusyDialog(R.string.wait_access_token);
-
-        mInstagram.authorize(new VoidOperationCallback(OperationCallbackBase.DispatchType.MainThread) {
-            @Override
-            protected void onCompleted() {
-                getView().dismissBusyDialog();
-
-                // To avoid bother user this check will be issued once per authorization.
-                checkGpsStatusAndFetchLocations();
-            }
-
-            @Override
-            protected void onError(Exception error) {
-                getView().dismissBusyDialog();
-                getView().onError(error);
-            }
-        });
-    }
-
-    @Override
-    public void checkGpsStatusAndFetchLocations() {
-        final LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            getView().promptUser(R.string.gps_title, R.string.gps_message, android.R.string.yes, android.R.string.no,
-                    new OperationCallback<String>() {
-                        @Override
-                        protected void onCompleted(String result) {
-                            if (result.equals(getView().getStringResource(android.R.string.yes))) {
-                                // Show device settings
-                                openActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                            }
-
-                            // Decision is made, now we can load locations
-                            loadLocations();
-                        }
-
-                        @Override
-                        protected void onError(Exception error) {
-                            // Anyway load that damn locations!
-                            loadLocations();
-                        }
-                    });
-        } else {
-            // No prompt needed, go fetching locations from Instagram.
-            loadLocations();
-        }
     }
 
     @Override
@@ -150,18 +87,23 @@ public class NearbyLocationPresenter extends PresenterBase<INearbyLocationsView>
     }
 
     @Override
-    public void logout() {
-        mInstagram.logout();
-        getView().logout();
+    public LocationInfo getLastKnownLocation() {
+        if (mLastKnownLocation == null) {
+            mLastKnownLocation = new LocationInfo(getView().getBaseContext());
+        }
+
+        return mLastKnownLocation;
     }
 
     @Override
     public void onLocationReceived(LocationInfo locationInfo) {
         LocationInfo oldLocation = mLastKnownLocation;
         mLastKnownLocation = locationInfo;
+
+        float distance = Utils.calculateDistance(locationInfo.lastLat, locationInfo.lastLong,
+                oldLocation.lastLat, oldLocation.lastLong);
         if (locationInfo.lastAccuracy < oldLocation.lastAccuracy
-                || locationInfo.lastLat != oldLocation.lastLat
-                || locationInfo.lastLong != oldLocation.lastLong) {
+                && distance > LocationLibraryConstants.MINIMUM_DISTANCE) {
 
             // Only update if location changed reasonably
             loadLocations();

@@ -22,6 +22,7 @@ public class UserSettings {
     private static final String API_ID = "id";
     private static final String API_NAME = "name";
     private static final String API_ACCESS_TOKEN = "access_token";
+    private static final String IS_MAP_PREFERRED = "is_map_preferred";
 
     private static UserSettings _instance;
 
@@ -115,4 +116,20 @@ public class UserSettings {
         return sharedPref.getString(API_ACCESS_TOKEN, null);
     }
 
+    /**
+     * Sets whether user prefers map view or not.
+     * @param isMapPrefered If true map view is preferred, if false - list view should be shown.
+     */
+    public void setIsMapPrefered(boolean isMapPrefered) {
+        editor.putBoolean(IS_MAP_PREFERRED, isMapPrefered);
+        editor.commit();
+    }
+
+    /**
+     * Returns whether user prefers map view or not.
+     * @return If true map view is preferred, if false - list view should be shown.
+     */
+    public boolean isMapPrefered() {
+        return sharedPref.getBoolean(IS_MAP_PREFERRED, true);
+    }
 }
