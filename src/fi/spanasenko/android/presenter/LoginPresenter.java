@@ -104,7 +104,10 @@ public class LoginPresenter extends PresenterBase<ILoginView> implements ILoginP
     private void openPreferredView() {
         // Open user preferred view, by default it's MapView.
         boolean preferMaps = UserSettings.getInstance(getContext()).isMapPrefered();
-        openActivity(preferMaps ? LocationsMapActivity.class : NearbyLocationsActivity.class);
+        Intent nextView =
+                new Intent(getContext(), preferMaps ? LocationsMapActivity.class : NearbyLocationsActivity.class);
+        nextView.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        openActivity(nextView);
 
         // We don't need this view to hang in back stack, so just finish it.
         getView().finish();
