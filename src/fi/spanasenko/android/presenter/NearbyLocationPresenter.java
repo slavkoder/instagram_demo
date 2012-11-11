@@ -92,10 +92,10 @@ public class NearbyLocationPresenter extends PresenterBase<INearbyLocationsView>
         LocationInfo oldLocation = mLastKnownLocation;
         mLastKnownLocation = locationInfo;
 
-        float distance = Utils.calculateDistance(locationInfo.lastLat, locationInfo.lastLong,
-                oldLocation.lastLat, oldLocation.lastLong);
+        float distanceMeters = Utils.calculateDistance(locationInfo.lastLat, locationInfo.lastLong,
+                oldLocation.lastLat, oldLocation.lastLong) / 1000;
         if (locationInfo.lastAccuracy < oldLocation.lastAccuracy
-                && distance > LocationLibraryConstants.MINIMUM_DISTANCE) {
+                && distanceMeters > LocationLibraryConstants.MINIMUM_DISTANCE) {
             // Only update if location changed reasonably
             loadLocations();
         }
