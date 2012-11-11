@@ -1,8 +1,3 @@
-/**
- * File: Images.java
- * Created: 11/9/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.model;
 
 /**
@@ -85,6 +80,5 @@ public class Images {
             this.height = height;
         }
     }
-
 
 }

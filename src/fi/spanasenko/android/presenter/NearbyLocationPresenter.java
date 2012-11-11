@@ -1,8 +1,3 @@
-/**
- * File: NearbyLocationPresenter.java
- * Created: 11/10/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.presenter;
 
 import android.content.BroadcastReceiver;
@@ -22,7 +17,7 @@ import fi.spanasenko.android.view.INearbyLocationsView;
 
 /**
  * NearbyLocationPresenter
- * Class description
+ * Implementation of nearby locations presenter interface.
  */
 public class NearbyLocationPresenter extends PresenterBase<INearbyLocationsView> implements INearbyLocationsPresenter,
         LocationBroadcastReceiver.LocationChangedListener {
@@ -46,12 +41,8 @@ public class NearbyLocationPresenter extends PresenterBase<INearbyLocationsView>
     public void loadLocations() {
         getView().showBusyDialog(R.string.wait_locations);
 
-        // Returns last known location
-        if (mLastKnownLocation == null) {
-            mLastKnownLocation = new LocationInfo(getView().getBaseContext());
-        }
-
-        mInstagram.fetchNearbyLocations(mLastKnownLocation.lastLat, mLastKnownLocation.lastLong,
+        // Asynchronously request locations from Instagram.
+        mInstagram.fetchNearbyLocations(getLastKnownLocation().lastLat, getLastKnownLocation().lastLong,
                 new OperationCallback<Location[]>(OperationCallbackBase.DispatchType.MainThread) {
                     @Override
                     protected void onCompleted(Location[] result) {
@@ -68,19 +59,20 @@ public class NearbyLocationPresenter extends PresenterBase<INearbyLocationsView>
     }
 
     @Override
-    public void registerObserver() {
-        // Register for location broadcast
+    public void registerLocationObserver() {
+        // Register for location broadcasts.
         getContext().registerReceiver(mLocationReceiver, new IntentFilter(LocationBroadcastReceiver.ACTION));
 
     }
 
     @Override
-    public void unregisterObserver() {
+    public void unregisterLocationObserver() {
         getContext().unregisterReceiver(mLocationReceiver);
     }
 
     @Override
     public void openLocation(Location location) {
+        // Show selected location in gallery view which shows available media from selected location.
         Intent showRecentMedia = new Intent(getContext(), ImageGalleryActivity.class);
         showRecentMedia.putExtra(ImageGalleryActivity.EXTRA_LOCATION_ID, location.getId());
         openActivity(showRecentMedia);
@@ -104,7 +96,6 @@ public class NearbyLocationPresenter extends PresenterBase<INearbyLocationsView>
                 oldLocation.lastLat, oldLocation.lastLong);
         if (locationInfo.lastAccuracy < oldLocation.lastAccuracy
                 && distance > LocationLibraryConstants.MINIMUM_DISTANCE) {
-
             // Only update if location changed reasonably
             loadLocations();
         }

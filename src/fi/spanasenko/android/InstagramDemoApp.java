@@ -1,8 +1,3 @@
-/**
- * File: InstagramDemoApp.java
- * Created: 11/8/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android;
 
 import android.app.Application;
@@ -25,7 +20,7 @@ public class InstagramDemoApp extends Application {
         ACRA.init(this);
         super.onCreate();
 
-        // Initialize location library and allow every location update
+        // Initialize location library and allow every location update.
         LocationLibrary.initialiseLibrary(getBaseContext(), true, getPackageName());
     }
 

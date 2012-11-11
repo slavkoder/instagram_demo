@@ -62,27 +62,27 @@ public class ImageDownloader {
      * Download the specified image from the Internet and binds it to the provided ImageView. The
      * binding is immediate if the image is found in the cache and will be done asynchronously
      * otherwise. A null bitmap will be associated to the ImageView if an error occurs.
-     * @param url The URL of the image to download.
+     * @param url       The URL of the image to download.
      * @param imageView The ImageLoaderView to bind the downloaded image to.
      */
     public void download(String url, ImageLoaderView imageView, int cornersRadius) {
         resetPurgeTimer();
 
-        // Get image from hash map if it is there
+        // Get image from hash map if it is there.
         Bitmap bitmap = getBitmapFromCache(url);
 
         if (bitmap == null) {
             imageView.startLoading();
             File file = mExternalCache.checkExternalCache(url);
             if (file != null) {
-                // Image is in external cache          
+                // Image is in external cache.
                 externalDownload(url, imageView, cornersRadius, file);
             } else {
-                // Image must be downloaded from server
+                // Image must be downloaded from server.
                 forceDownload(url, imageView, cornersRadius);
             }
         } else {
-            // Image is in hash map
+            // Image is in hash map.
             cancelPotentialDownload(url, imageView);
             imageView.setImageBitmap(bitmap, true);
         }
@@ -251,28 +251,28 @@ public class ImageDownloader {
         }
 
         /**
-         * Once the image is downloaded, associates it to the imageView
+         * Once the image is downloaded, associates it to the imageView.
          */
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             if (isCancelled() || bitmap == null) {
-                // Set the error default avatar image
+                // Set the error default avatar image.
                 return;
             }
 
             Bitmap result = bitmap; //ImageUtilities.getRoundedCornerBitmap(bitmap, mRoundCorners);
             addBitmapToCache(url, result);
 
-            // Add the bitmap to the external cache as well
+            // Add the bitmap to the external cache as well.
             mExternalCache.addBitmapToExternalCache(url, result);
 
             if (imageViewReference != null) {
                 ImageLoaderView imageView = imageViewReference.get();
                 BitmapDownloaderTask bitmapDownloaderTask = getBitmapDownloaderTask(imageView);
                 // Change bitmap only if this process is still associated with it
-                // Or if we don't use any bitmap to task association (NO_DOWNLOADED_DRAWABLE mode)
+                // Or if we don't use any bitmap to task association (NO_DOWNLOADED_DRAWABLE mode).
                 if (this == bitmapDownloaderTask) {
-                    // Set the avatar image
+                    // Set the avatar image.
                     imageView.setImageBitmap(result, true);
                 }
             }
@@ -328,7 +328,7 @@ public class ImageDownloader {
                 }
             };
 
-    // Soft cache for bitmaps kicked out of hard cache
+    // Soft cache for bitmaps kicked out of hard cache.
     private final static ConcurrentHashMap<String, SoftReference<Bitmap>> sSoftBitmapCache =
             new ConcurrentHashMap<String, SoftReference<Bitmap>>(HARD_CACHE_CAPACITY / 2);
 

@@ -1,8 +1,3 @@
-/**
- * File: NearbyLocationsActivity.java
- * Created: 11/8/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android;
 
 import android.content.Intent;
@@ -46,14 +41,14 @@ public class NearbyLocationsActivity extends BaseActivity implements INearbyLoca
     protected void onResume() {
         super.onResume();
 
-        mPresenter.registerObserver();
+        mPresenter.registerLocationObserver();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        mPresenter.unregisterObserver();
+        mPresenter.unregisterLocationObserver();
     }
 
     @Override
@@ -68,10 +63,10 @@ public class NearbyLocationsActivity extends BaseActivity implements INearbyLoca
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_show_map: {
-                // Save user view preference
+                // Save user view preference.
                 UserSettings.getInstance(this).setIsMapPrefered(true);
 
-                // Show list view
+                // Show list view.
                 Intent showMap = new Intent(this, LocationsMapActivity.class);
                 startActivity(showMap);
                 finish();
@@ -84,9 +79,12 @@ public class NearbyLocationsActivity extends BaseActivity implements INearbyLoca
 
     @Override
     public void updateLocations(Location[] locations) {
+        // Create and set adapter to show locations.
         LocationListAdapter adapter = new LocationListAdapter(this, locations);
         adapter.setUserLocation(new LocationInfo(getBaseContext()));
         mLocationList.setAdapter(adapter);
+
+        // When user selects an item open media gallery for selected location.
         mLocationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {

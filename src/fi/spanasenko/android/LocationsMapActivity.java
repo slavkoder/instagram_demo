@@ -1,8 +1,3 @@
-/**
- * File: LocationsMapActivity.java
- * Created: 11/10/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android;
 
 import android.app.ProgressDialog;
@@ -45,7 +40,7 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
     private LocationsOverlay mItemizedOverlay;
     private MyLocationOverlay mMyLocationOverlay;
 
-    // Ugly copypaste from BaseActivity
+    // Ugly copypaste from BaseActivity.
     private ProgressDialog _busyDialog;
 
     protected boolean isBusyDialogVisible;
@@ -74,19 +69,12 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.locations_map_screen);
 
-        if (!UserSettings.getInstance(this).isMapPrefered()) {
-            // Show list activity immediately
-            startActivity(new Intent(this, NearbyLocationsActivity.class));
-            finish();
-            return;
-        }
-
+        // Init map view and map overlays.
         mMapView = (TapControlledMapView) findViewById(R.id.map_view);
         mMapView.setBuiltInZoomControls(true);
-
         mMapOverlays = mMapView.getOverlays();
 
-        // dismiss balloon upon single tap of MapView (iOS behavior)
+        // Dismiss balloon upon single tap of MapView (iOS behavior).
         mMapView.setOnSingleTapListener(new OnSingleTapListener() {
             @Override
             public boolean onSingleTap(MotionEvent e) {
@@ -101,12 +89,14 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
 
         mPresenter = new NearbyLocationPresenter(this);
 
+        // Prepare itemized overlay for Instagram locations.
         Drawable drawable = this.getResources().getDrawable(R.drawable.map_marker);
         mItemizedOverlay = new LocationsOverlay(drawable, mMapView, mPresenter);
         mItemizedOverlay.setBalloonBottomOffset(drawable.getMinimumHeight());
         mItemizedOverlay.setShowClose(false);
         mItemizedOverlay.setShowDisclosure(true);
 
+        // Create overlay to display user's current location.
         mMyLocationOverlay = new MyLocationOverlay(this, mMapView);
         mMyLocationOverlay.enableMyLocation();
         mMapOverlays.add(mMyLocationOverlay);
@@ -114,27 +104,33 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
         if (savedInstanceState == null) {
             final MapController mc = mMapView.getController();
 
+            // Get current user location or at least last known user location.
             GeoPoint myLocation = mMyLocationOverlay.getMyLocation();
             if (myLocation == null) {
                 LocationInfo lastKnown = mPresenter.getLastKnownLocation();
                 myLocation = Utils.getGeoPoint(lastKnown.lastLat, lastKnown.lastLong);
             }
 
+            // Move map view to show user current location.
             mc.animateTo(myLocation);
             mc.setZoom(DEFAULT_ZOOM_LEVEL);
         }
 
+        // Start loading nearby locations.
         mPresenter.loadLocations();
     }
 
     @Override
     public void updateLocations(Location[] locations) {
+        // Remove old items from overlay.
         mItemizedOverlay.clearOverlays();
 
+        // Load new items to overlay.
         for (Location loc : locations) {
             mItemizedOverlay.addOverlay(new LocationOverlayItem(loc));
         }
 
+        // Add overlay to map and apply changes.
         mMapOverlays.add(mItemizedOverlay);
         mMapView.invalidate();
     }
@@ -148,14 +144,14 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
             finish();
         }
 
-        mPresenter.registerObserver();
+        mPresenter.registerLocationObserver();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        mPresenter.unregisterObserver();
+        mPresenter.unregisterLocationObserver();
     }
 
     @Override
@@ -174,10 +170,10 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
                 return true;
             }
             case R.id.menu_show_list: {
-                // Save user view preference
+                // Save user view preference.
                 UserSettings.getInstance(this).setIsMapPrefered(false);
 
-                // Show list view
+                // Show list view.
                 Intent showList = new Intent(this, NearbyLocationsActivity.class);
                 startActivity(showList);
                 finish();
@@ -367,11 +363,6 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
     @Override
     public String getStringResource(int resourceId) {
         return getString(resourceId);
-    }
-
-    @Override
-    public int getIntResource(int resourceId) {
-        return getIntResource(resourceId);
     }
 
     @Override

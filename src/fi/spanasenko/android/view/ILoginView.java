@@ -1,16 +1,14 @@
-/**
- * File: ILoginView.java
- * Created: 11/11/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.view;
 
 /**
  * ILoginView
- * Class description
+ * Login view interface.
  */
 public interface ILoginView extends IBaseView {
 
+    /**
+     * Finishes the activity.
+     */
     void finish();
 
 }

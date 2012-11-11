@@ -1,8 +1,3 @@
-/**
- * File: UserSettings.java
- * Created: 11/8/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.utils;
 
 import android.content.Context;
@@ -47,7 +42,6 @@ public class UserSettings {
 
         return _instance;
     }
-
 
     /**
      * Stores user access token and related data in the application shared preferences.

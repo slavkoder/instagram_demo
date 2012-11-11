@@ -1,8 +1,3 @@
-/**
- * File: LoginPresenter.java
- * Created: 11/11/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.presenter;
 
 import android.content.Context;
@@ -21,7 +16,7 @@ import fi.spanasenko.android.view.ILoginView;
 
 /**
  * LoginPresenter
- * Class description
+ * Implementation of the login presenter.
  */
 public class LoginPresenter extends PresenterBase<ILoginView> implements ILoginPresenter {
 
@@ -38,7 +33,7 @@ public class LoginPresenter extends PresenterBase<ILoginView> implements ILoginP
 
     @Override
     public void checkAuthorizationAndShowNextView() {
-        // Check authorization status and authorize or show next view
+        // Check authorization status and authorize or show next view.
         if (!mInstagram.hasAccessToken()) {
             authorize();
         } else {
@@ -46,6 +41,7 @@ public class LoginPresenter extends PresenterBase<ILoginView> implements ILoginP
         }
     }
 
+    @Override
     public void checkGpsStatusAndShowNextView() {
         final LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
 
@@ -84,7 +80,7 @@ public class LoginPresenter extends PresenterBase<ILoginView> implements ILoginP
             protected void onCompleted() {
                 getView().dismissBusyDialog();
 
-                // To avoid bother user this check will be issued once per authorization.
+                // To avoid bothering user to often this check will be issued once per authorization.
                 checkGpsStatusAndShowNextView();
             }
 

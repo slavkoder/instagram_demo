@@ -1,8 +1,3 @@
-/**
- * File: LocationBroadcastReceiver.java
- * Created: 11/10/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.utils;
 
 import android.content.BroadcastReceiver;
@@ -14,7 +9,7 @@ import com.littlefluffytoys.littlefluffylocationlibrary.LocationLibraryConstants
 
 /**
  * LocationBroadcastReceiver
- * Class description
+ * Receives location update broadcasts from Little Fluffy Location Library.
  */
 public class LocationBroadcastReceiver extends BroadcastReceiver {
 

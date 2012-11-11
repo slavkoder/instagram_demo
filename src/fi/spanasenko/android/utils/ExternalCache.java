@@ -29,7 +29,6 @@ public class ExternalCache {
 
     /**
      * Adds this bitmap to the external cache.
-     *
      * @param url    The url link to the image
      * @param bitmap The newly downloaded bitmap.
      */
@@ -38,7 +37,7 @@ public class ExternalCache {
             try {
                 String filePath = createFilePath(url);
                 if (filePath != null) {
-                    // Write the image to file
+                    // Write the image to file.
                     writeToExternalCache(filePath, bitmap);
                 }
             } catch (Exception e) {
@@ -48,17 +47,16 @@ public class ExternalCache {
     }
 
     /**
-     * Checks if the image is in the external cache (sd card)
-     *
-     * @param url The url of the image to locate it in memory
-     * @return File if the file is found, otherwise returns null
+     * Checks if the image is in the external cache (sd card).
+     * @param url The url of the image to locate it in memory.
+     * @return File if the file is found, otherwise returns null.
      */
     public File checkExternalCache(String url) {
 
         File dir = new File(mDirectory);
 
         if (dir != null) {
-            // Check if cache needs to be cleared
+            // Check if cache needs to be cleared.
             if (mCurExternalCacheSize >= CACHE_MAX_SIZE) {
                 clearCache(dir);
                 mCurExternalCacheSize = 0;
@@ -70,7 +68,7 @@ public class ExternalCache {
                 imageFile = URLEncoder.encode(url, "UTF-8");
                 File file = new File(mDirectory, imageFile);
                 if (file != null && file.exists()) {
-                    // Found the file in the external cache
+                    // Found the file in the external cache.
                     return file;
                 }
             } catch (UnsupportedEncodingException e) {
@@ -82,15 +80,14 @@ public class ExternalCache {
     }
 
     /**
-     * Creates a file path to store the image
-     *
-     * @param url The unique image url path on the server
-     * @return String of the file path, null if a file path couldn't be created
+     * Creates a file path to store the image.
+     * @param url The unique image url path on the server.
+     * @return String of the file path, null if a file path couldn't be created.
      */
     private String createFilePath(String url) {
         String status = Environment.getExternalStorageState();
         if (status.equals(Environment.MEDIA_MOUNTED)) {
-            // Has external storage to save image            
+            // Has external storage to save image.
             String dirPath = createDirectory();
 
             if (dirPath != null && dirPath.length() > 0) {
@@ -112,13 +109,12 @@ public class ExternalCache {
     }
 
     /**
-     * Creates a directory on the externalFilesDir
-     *
-     * @return String of the directory path
+     * Creates a directory on the externalFilesDir.
+     * @return String of the directory path.
      */
     private String createDirectory() {
         File directory = new File(mDirectory);
-        // have the object build the directory structure, if needed.
+        // Have the object build the directory structure, if needed.
         if (directory != null) {
             directory.mkdirs();
             return directory.toString();
@@ -127,10 +123,9 @@ public class ExternalCache {
     }
 
     /**
-     * Returns the size of all the files in the given directory
-     *
-     * @param dir The directory you want to know the size of
-     * @return The size of all the files in the directory
+     * Returns the size of all the files in the given directory.
+     * @param dir The directory you want to know the size of.
+     * @return The size of all the files in the directory.
      */
     private long getExternalCacheSize(File dir) {
         long size = 0;
@@ -138,11 +133,11 @@ public class ExternalCache {
             File[] fileList = dir.listFiles();
             if (fileList != null) {
                 for (int i = 0; i < fileList.length; i++) {
-                    // Recursive call if it's a directory
+                    // Recursive call if it's a directory.
                     if (fileList[i].isDirectory()) {
                         size += getExternalCacheSize(fileList[i]);
                     } else {
-                        // Sum the file size in bytes
+                        // Sum the file size in bytes.
                         size += fileList[i].length();
                     }
                 }
@@ -152,9 +147,8 @@ public class ExternalCache {
     }
 
     /**
-     * Clears all files in the given directory
-     *
-     * @param dir The file path to the directory to clear
+     * Clears all files in the given directory.
+     * @param dir The file path to the directory to clear.
      */
     private void clearCache(File dir) {
         if (dir != null) {
@@ -174,10 +168,9 @@ public class ExternalCache {
     }
 
     /**
-     * Start a thread to write the bitmap to the external cache
-     *
-     * @param filePath The filepath string to write the image to
-     * @param bitmap   The image itself
+     * Start a thread to write the bitmap to the external cache.
+     * @param filePath The filepath string to write the image to.
+     * @param bitmap   The image itself.
      */
     private void writeToExternalCache(final String filePath, final Bitmap bitmap) {
         new Thread(new Runnable() {

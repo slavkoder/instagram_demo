@@ -14,6 +14,10 @@ import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.utils.UiUtils;
 import fi.spanasenko.android.view.IBaseView;
 
+/**
+ * BaseActivity
+ * Encapsulates methods commonly used by other activities, such as showing busy dialog.
+ */
 public class BaseActivity extends Activity implements IBaseView {
 
     private ProgressDialog _busyDialog;
@@ -88,6 +92,7 @@ public class BaseActivity extends Activity implements IBaseView {
         }
     }
 
+    @Override
     public void onError(Exception e) {
         onError(e, new VoidOperationCallback() {
 
@@ -115,13 +120,14 @@ public class BaseActivity extends Activity implements IBaseView {
         FlurryAgent.onError(getString(R.string.flurry_error_code), e.getMessage(), this.getClass().getSimpleName());
     }
 
+    @Override
     public void notifyUser(int titleId, int messageId) {
         notifyUserTitle = getStringResource(titleId);
         notifyUserMessage = getStringResource(messageId);
         notifyUser(notifyUserTitle, notifyUserMessage);
     }
 
-    public void notifyUser(String title, String message) {
+    protected void notifyUser(String title, String message) {
         notifyUserTitle = title;
         notifyUserMessage = message;
         UiUtils.notifyUser(this, notifyUserTitle, notifyUserMessage, new VoidOperationCallback() {
@@ -145,15 +151,17 @@ public class BaseActivity extends Activity implements IBaseView {
         isNotifyUserVisible = true;
     }
 
+    @Override
     public void showBusyDialog() {
         showBusyDialog(R.string.busy_dialog_default_message);
     }
 
+    @Override
     public void showBusyDialog(int resourceId) {
         showBusyDialog(getResources().getString(resourceId));
     }
 
-    public void showBusyDialog(String message) {
+    protected void showBusyDialog(String message) {
         busyDialogMessage = message;
 
         if (_busyDialog == null) {
@@ -166,6 +174,7 @@ public class BaseActivity extends Activity implements IBaseView {
         isBusyDialogVisible = true;
     }
 
+    @Override
     public void dismissBusyDialog() {
         if (_busyDialog != null) {
             try {
@@ -177,24 +186,22 @@ public class BaseActivity extends Activity implements IBaseView {
         busyDialogMessage = null;
     }
 
+    @Override
     public void promptUser(int titleId, int messageId, int positiveButtonId, int negativeButtonId,
             final OperationCallback<String> callback) {
         UiUtils.promptUser(this, titleId, messageId, getString(positiveButtonId), getString(negativeButtonId),
                 callback);
     }
 
+    @Override
     public void promptUser(String title, String message, final String positiveButton, final String negativeButton,
             final OperationCallback<String> callback) {
         UiUtils.promptUser(this, title, message, positiveButton, negativeButton, callback);
     }
 
+    @Override
     public String getStringResource(int resourceId) {
         return getResources().getString(resourceId);
-    }
-
-    @Override
-    public int getIntResource(int resourceId) {
-        return getIntResource(resourceId);
     }
 
     @Override
@@ -223,7 +230,7 @@ public class BaseActivity extends Activity implements IBaseView {
     protected void onPause() {
         super.onPause();
 
-        // dialog must be closed during onPause or it will leak the activity on rotation
+        // Dialog must be closed during onPause or it will leak the activity on rotation.
         dismissBusyDialog();
     }
 

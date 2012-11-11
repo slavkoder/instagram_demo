@@ -1,8 +1,3 @@
-/**
- * File: LocationListAdapter.java
- * Created: 11/9/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.ui;
 
 import android.content.Context;
@@ -31,7 +26,7 @@ public class LocationListAdapter extends BaseAdapter {
 
     /**
      * Constructor.
-     * @param ctx Parent context.
+     * @param ctx       Parent context.
      * @param locations Locations array to be displayed with this adapter.
      */
     public LocationListAdapter(Context ctx, Location[] locations) {

@@ -1,8 +1,3 @@
-/**
- * File: Media.java
- * Created: 11/9/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.model;
 
 /**

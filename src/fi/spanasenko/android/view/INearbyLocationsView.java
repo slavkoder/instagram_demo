@@ -10,7 +10,7 @@ import fi.spanasenko.android.model.Location;
 
 /**
  * INearbyLocationsView
- * Class description
+ * Nearby locations view interface.
  */
 public interface INearbyLocationsView extends IBaseView {
 

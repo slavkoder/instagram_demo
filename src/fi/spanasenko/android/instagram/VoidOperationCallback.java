@@ -1,5 +1,9 @@
 package fi.spanasenko.android.instagram;
 
+/**
+ * VoidOperationCallback
+ * Abstract class representing callback for operation which doesn't have any data on completion.
+ */
 public abstract class VoidOperationCallback extends OperationCallbackBase
 {
 	private DispatchType dispatchType;

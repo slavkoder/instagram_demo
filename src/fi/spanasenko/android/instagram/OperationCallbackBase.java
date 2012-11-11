@@ -3,6 +3,10 @@ package fi.spanasenko.android.instagram;
 import android.os.Handler;
 import android.os.Looper;
 
+/**
+ * OperationCallbackBase
+ * Abstract class used as a super class for operation callbacks.
+ */
 public abstract class OperationCallbackBase implements Runnable {
 
 	public enum DispatchType { CurrentThread, MainThread, NewThread }

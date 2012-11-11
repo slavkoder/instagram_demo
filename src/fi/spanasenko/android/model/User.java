@@ -1,8 +1,3 @@
-/**
- * File: User.java
- * Created: 11/8/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.model;
 
 import android.os.Parcel;
@@ -11,9 +6,9 @@ import com.google.gson.Gson;
 
 /**
  * User
- * Representation of a user object from Instagram API.
+ * Representation of a user class from Instagram API.
  */
-public class User extends BaseModel {
+public class User {
 
     private String id;
     private String username;
@@ -61,10 +56,8 @@ public class User extends BaseModel {
         this.access_token = accessToken;
     }
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>()
-    {
-        public User createFromParcel(Parcel in)
-        {
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        public User createFromParcel(Parcel in) {
             String json = in.readString();
             Gson gson = new Gson();
             return gson.fromJson(json, User.class);

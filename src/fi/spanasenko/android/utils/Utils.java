@@ -1,8 +1,3 @@
-/**
- * File: Utils.java
- * Created: 11/9/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.utils;
 
 import com.google.android.maps.GeoPoint;
@@ -23,8 +18,7 @@ public class Utils {
      * @param lon2 Longitude of second point.
      * @return Distance between given geo points.
      */
-    public static float calculateDistance(float lat1, float lon1, float lat2, float lon2)
-    {
+    public static float calculateDistance(float lat1, float lon1, float lat2, float lon2) {
         float dLat = (float) Math.toRadians(lat2 - lat1);
         float dLon = (float) Math.toRadians(lon2 - lon1);
         float a =
@@ -42,7 +36,7 @@ public class Utils {
      * @return GeoPoint object from given latitude and longitude.
      */
     public static GeoPoint getGeoPoint(float lat, float lng) {
-        return new GeoPoint((int)(lat * 1E6), (int)(lng * 1E6));
+        return new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6));
     }
 
 }

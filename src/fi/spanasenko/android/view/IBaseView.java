@@ -1,6 +1,5 @@
 package fi.spanasenko.android.view;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import fi.spanasenko.android.instagram.OperationCallback;
@@ -9,31 +8,71 @@ import fi.spanasenko.android.instagram.OperationCallback;
  * IBaseView.
  * The default view which contains common functionality against all primary views.
  */
-public interface IBaseView
-{
-	void onError(Exception e);
+public interface IBaseView {
 
-	void notifyUser(int titleId, int messageId);
-	
-	void showBusyDialog();
-	
-	void showBusyDialog(int resourceId);
-	
-	void dismissBusyDialog();
-	
-	void promptUser(String title, String message, final String positiveButton, final String negativeButton,
+    /**
+     * Handles error.
+     * @param e Exception caused error.
+     */
+    void onError(Exception e);
+
+    /**
+     * Shows notification to user.
+     * @param titleId   String resource with dialog title.
+     * @param messageId String resource with dialog message.
+     */
+    void notifyUser(int titleId, int messageId);
+
+    /**
+     * Shows progress dialog.
+     */
+    void showBusyDialog();
+
+    /**
+     * Shows progress dialog with a message.
+     * @param resourceId Id of string resource with the message to be shown.
+     */
+    void showBusyDialog(int resourceId);
+
+    /**
+     * Hides progress dialog.
+     */
+    void dismissBusyDialog();
+
+    /**
+     * Shows dialog with two buttons to user.
+     * @param title          Title of the dialog.
+     * @param message        Dialog message.
+     * @param positiveButton Positive button label.
+     * @param negativeButton Negative button label.
+     * @param callback       Callback object responsible for handling result, where string represents pressed button label.
+     */
+    void promptUser(String title, String message, final String positiveButton, final String negativeButton,
             final OperationCallback<String> callback);
 
+    /**
+     * Shows dialog with two buttons to user, instead of strings uses resource ids.
+     * @param title          Title of the dialog.
+     * @param message        Dialog message.
+     * @param positiveButton Positive button label.
+     * @param negativeButton Negative button label.
+     * @param callback       Callback object responsible for handling result, where string represents pressed button label.
+     */
     void promptUser(int title, int message, int positiveButton, int negativeButton,
             final OperationCallback<String> callback);
-	
-	String getStringResource(int resourceId);
-	
-	int getIntResource(int resourceId);
-	
-	void startActivity(Intent i);
-	
-	ComponentName startService(Intent i);
+
+    /**
+     * Returns string resource.
+     * @param resourceId Id of the string resource.
+     * @return String from resources.
+     */
+    String getStringResource(int resourceId);
+
+    /**
+     * Starts activity for given intent.
+     * @param intent Intent to start.
+     */
+    void startActivity(Intent intent);
 
     /**
      * Returns current activity context.

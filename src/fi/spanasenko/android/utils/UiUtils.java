@@ -1,8 +1,3 @@
-/**
- * File: UiUtils.java
- * Created: 11/8/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.utils;
 
 import android.app.AlertDialog;
@@ -25,7 +20,6 @@ public class UiUtils {
     public static void displayError(Context context, Exception exception, final VoidOperationCallback callback) {
         notifyUser(context, R.string.error_dialog_title, R.string.unexpected_error_message, callback);
     }
-
 
     public static void notifyUser(Context context, String message) {
         String defaultTitle = context.getResources().getString(R.string.info_dialog_title);
@@ -55,7 +49,7 @@ public class UiUtils {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setIcon(android.R.drawable.ic_dialog_alert);
         builder.setMessage(message).setTitle(title).setCancelable(false)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (callback != null) {
                             callback.notifyCompleted();

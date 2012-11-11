@@ -1,8 +1,3 @@
-/**
- * File: ImageGalleryActivity.java
- * Created: 11/9/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android;
 
 import android.content.Intent;
@@ -40,7 +35,7 @@ public class ImageGalleryActivity extends BaseActivity {
 
         Bundle extra = getIntent().getExtras();
         if (extra == null || !extra.containsKey(EXTRA_LOCATION_ID)) {
-            // There is nothing to display
+            // There is nothing to display.
             finish();
             return;
         }
@@ -58,19 +53,20 @@ public class ImageGalleryActivity extends BaseActivity {
      */
     private void fetchMediaForLocation(String locationId) {
         showBusyDialog(R.string.wait_media);
-        mInstagram.fetchRecentMedia(locationId, new OperationCallback<Media[]>(OperationCallbackBase.DispatchType.MainThread) {
-            @Override
-            protected void onCompleted(Media[] result) {
-                dismissBusyDialog();
-                updateGridView(result);
-            }
+        mInstagram.fetchRecentMedia(locationId,
+                new OperationCallback<Media[]>(OperationCallbackBase.DispatchType.MainThread) {
+                    @Override
+                    protected void onCompleted(Media[] result) {
+                        dismissBusyDialog();
+                        updateGridView(result);
+                    }
 
-            @Override
-            protected void onError(Exception error) {
-                dismissBusyDialog();
-                UiUtils.displayError(ImageGalleryActivity.this, error);
-            }
-        });
+                    @Override
+                    protected void onError(Exception error) {
+                        dismissBusyDialog();
+                        UiUtils.displayError(ImageGalleryActivity.this, error);
+                    }
+                });
     }
 
     /**

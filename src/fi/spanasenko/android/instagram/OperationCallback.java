@@ -1,5 +1,9 @@
 package fi.spanasenko.android.instagram;
 
+/**
+ * OperationCallback<T>
+ * Abstract class representing callback for operation which returns result of type T.
+ */
 public abstract class OperationCallback<T> extends OperationCallbackBase
 {
 	private DispatchType dispatchType;

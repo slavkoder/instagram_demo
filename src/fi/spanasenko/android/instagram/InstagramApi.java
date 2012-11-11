@@ -30,7 +30,6 @@ public class InstagramApi {
     private UserSettings mSession;
 
     private String mAuthUrl;
-    private String mTokenUrl;
     private String mAccessToken;
 
     // Instagram API endpoints
@@ -53,8 +52,6 @@ public class InstagramApi {
         mSession = UserSettings.getInstance(context);
         mAccessToken = mSession.getAccessToken();
 
-        mTokenUrl = TOKEN_URL + "?client_id=" + CLIENT_ID + "&client_secret="
-                + CLIENT_SECRET + "&redirect_uri=" + CALLBACK_URL + "&grant_type=authorization_code";
         mAuthUrl = AUTH_URL + "?client_id=" + CLIENT_ID + "&redirect_uri="
                 + CALLBACK_URL + "&response_type=code&display=touch&scope=likes+comments+relationships";
     }
@@ -90,6 +87,11 @@ public class InstagramApi {
         return (mAccessToken == null) ? false : true;
     }
 
+    /**
+     * Requests authorization from Instagram. Shows authorization dialog and requests access token.
+     * @param context  Parent context used for showing dialog. Must be relevant Activity.
+     * @param callback Callback object responsible for handling completion or error.
+     */
     public void authorize(Context context, final VoidOperationCallback callback) {
         InstagramDialog.OAuthDialogListener listener = new InstagramDialog.OAuthDialogListener() {
             @Override
@@ -132,7 +134,7 @@ public class InstagramApi {
 
     /**
      * Requests access token for given code.
-     * @param code Code to be used for access token request.
+     * @param code     Code to be used for access token request.
      * @param callback Callback object responsible for handling completion or error.
      */
     private void getAccessToken(final String code, final OperationCallback<User> callback) {
@@ -166,6 +168,12 @@ public class InstagramApi {
         }.start();
     }
 
+    /**
+     * Requests from Instagram API nearby locations for given latitude and longitude values.
+     * @param latitude  Latitude.
+     * @param longitude Longitude.
+     * @param callback  Callback object responsible for handling server response.
+     */
     public void fetchNearbyLocations(final float latitude, final float longitude,
             final OperationCallback<Location[]> callback) {
 
@@ -174,14 +182,16 @@ public class InstagramApi {
             public void run() {
                 Log.i(TAG, "Getting access token");
                 try {
+                    // Prepare request.
                     String getParams = String.format(LOCATIONS_ENDPOINT_FORMAT, latitude, longitude, mAccessToken);
                     String url = API_URL + getParams;
                     String response = getRequest(url);
 
                     Log.i(TAG, "response " + response);
-                    JSONObject responseJson = (JSONObject) new JSONTokener(response).nextValue();
 
+                    // Parse JSON answer and notify caller.
                     Gson gson = new Gson();
+                    JSONObject responseJson = (JSONObject) new JSONTokener(response).nextValue();
                     List<Location> locations = new ArrayList<Location>(3);
                     JSONArray locationsJson = responseJson.getJSONArray("data");
                     for (int i = 0; i < locationsJson.length(); i++) {
@@ -198,21 +208,27 @@ public class InstagramApi {
         }.start();
     }
 
-    public void fetchRecentMedia(final String id, final OperationCallback<Media[]> callback) {
+    /**
+     * Requests from Instagram API recent media for given location id.
+     * @param locationId Id of the location to search for media.
+     * @param callback   Callback object responsible for handling server response.
+     */
+    public void fetchRecentMedia(final String locationId, final OperationCallback<Media[]> callback) {
 
         new Thread() {
             @Override
             public void run() {
                 Log.i(TAG, "Getting access token");
                 try {
-                    String getParams = String.format(MEDIA_ENDPOINT_FORMAT, id, mAccessToken);
+                    // Form request.
+                    String getParams = String.format(MEDIA_ENDPOINT_FORMAT, locationId, mAccessToken);
                     String url = API_URL + getParams;
                     String response = getRequest(url);
-
                     Log.i(TAG, "response " + response);
-                    JSONObject responseJson = (JSONObject) new JSONTokener(response).nextValue();
 
+                    // Parse JSON data
                     Gson gson = new Gson();
+                    JSONObject responseJson = (JSONObject) new JSONTokener(response).nextValue();
                     List<Media> media = new ArrayList<Media>();
                     JSONArray mediaJson = responseJson.getJSONArray("data");
                     for (int i = 0; i < mediaJson.length(); i++) {
@@ -283,7 +299,7 @@ public class InstagramApi {
     /**
      * Issues POST request to the given url and writes given data from string.
      * @param requestUrl Api endpoint for POST request.
-     * @param postData Data to be posted.
+     * @param postData   Data to be posted.
      * @return Server response.
      * @throws IOException
      */

@@ -1,8 +1,3 @@
-/**
- * File: GalleryAdapter.java
- * Created: 11/9/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.ui;
 
 import android.content.Context;
@@ -27,7 +22,7 @@ public class GalleryAdapter extends BaseAdapter {
 
     /**
      * Constructor.
-     * @param ctx Parent context.
+     * @param ctx      Parent context.
      * @param pictures Pictures array to be displayed with this adapter.
      */
     public GalleryAdapter(Context ctx, Media[] pictures) {
@@ -72,8 +67,7 @@ public class GalleryAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.image = (ImageLoaderView) view;
             view.setTag(holder);
-        }
-        else {
+        } else {
             holder = (ViewHolder) view.getTag();
         }
 
@@ -82,6 +76,10 @@ public class GalleryAdapter extends BaseAdapter {
         return view;
     }
 
+    /**
+     * ViewHolder
+     * Holds view components.
+     */
     private static class ViewHolder {
         public ImageLoaderView image;
     }

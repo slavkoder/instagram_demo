@@ -1,8 +1,3 @@
-/**
- * File: LocationsOverlay.java
- * Created: 11/10/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.ui;
 
 import android.graphics.drawable.Drawable;
@@ -15,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  * LocationsOverlay
- * Class description
+ * Rerpresents overlay with Locations from Instagram API.
  */
 public class LocationsOverlay extends BalloonItemizedOverlay<LocationOverlayItem> {
 
@@ -38,6 +33,13 @@ public class LocationsOverlay extends BalloonItemizedOverlay<LocationOverlayItem
         return mOverlays.size();
     }
 
+    @Override
+    protected boolean onBalloonTap(int index, LocationOverlayItem item) {
+        Location selectedLocation = item.getLocation();
+        mPresenter.openLocation(selectedLocation);
+        return true;
+    }
+
     /**
      * Adds overlay item.
      * @param overlay Location overlay item.
@@ -52,12 +54,5 @@ public class LocationsOverlay extends BalloonItemizedOverlay<LocationOverlayItem
      */
     public void clearOverlays() {
         mOverlays.clear();
-    }
-
-    @Override
-    protected boolean onBalloonTap(int index, LocationOverlayItem item) {
-        Location selectedLocation = item.getLocation();
-        mPresenter.openLocation(selectedLocation);
-        return true;
     }
 }

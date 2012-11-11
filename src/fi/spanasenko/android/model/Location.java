@@ -1,8 +1,3 @@
-/**
- * File: Location.java
- * Created: 11/8/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.model;
 
 import android.os.Parcel;
@@ -11,9 +6,9 @@ import com.google.gson.Gson;
 
 /**
  * Location
- * Class description
+ * Class representing location item from Instagram API.
  */
-public class Location extends BaseModel {
+public class Location {
 
     private String id;
     private float latitude;
@@ -64,10 +59,8 @@ public class Location extends BaseModel {
     }
 
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>()
-    {
-        public User createFromParcel(Parcel in)
-        {
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        public User createFromParcel(Parcel in) {
             String json = in.readString();
             Gson gson = new Gson();
             return gson.fromJson(json, User.class);

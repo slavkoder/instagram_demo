@@ -1,8 +1,3 @@
-/**
- * File: INearbyLocationsPresenter.java
- * Created: 11/10/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.presenter;
 
 import com.littlefluffytoys.littlefluffylocationlibrary.LocationInfo;
@@ -11,7 +6,8 @@ import fi.spanasenko.android.view.INearbyLocationsView;
 
 /**
  * INearbyLocationsPresenter
- * Class description
+ * Interface for nearby locations presenter which. Responsible for listening for location changes and requesting
+ * locations from Instagram according to user's position.
  */
 public interface INearbyLocationsPresenter extends IBasePresenter<INearbyLocationsView> {
 
@@ -21,14 +17,14 @@ public interface INearbyLocationsPresenter extends IBasePresenter<INearbyLocatio
     void loadLocations();
 
     /**
-     *
+     * Registers observer for location changes.
      */
-    void registerObserver();
+    void registerLocationObserver();
 
     /**
-     *
+     * Unregisters location changes observer.
      */
-    void unregisterObserver();
+    void unregisterLocationObserver();
 
     /**
      * Opens selected location.

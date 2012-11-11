@@ -1,8 +1,3 @@
-/**
- * File: LocationOverlayItem.java
- * Created: 11/11/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android.ui;
 
 import com.google.android.maps.OverlayItem;

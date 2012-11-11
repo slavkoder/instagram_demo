@@ -1,8 +1,3 @@
-/**
- * File: fi.spanasenko.android.LoginActivity.java
- * Created: 11/11/12
- * Author: Viacheslav Panasenko
- */
 package fi.spanasenko.android;
 
 import android.os.Bundle;
