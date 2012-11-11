@@ -24,6 +24,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         if (extra != null && extra.getBoolean(BaseActivity.EXTRA_LOGOUT)) {
             mPresenter.logout();
         } else {
+            InstagramDemoApp.getInstance(this).setLoggingOut(false);
             mPresenter.checkAuthorizationAndShowNextView();
         }
     }
