@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Thiago Locatelli <thiago.locatelli@gmail.com>
@@ -183,7 +184,8 @@ public class InstagramApi {
                 Log.i(TAG, "Getting access token");
                 try {
                     // Prepare request.
-                    String getParams = String.format(LOCATIONS_ENDPOINT_FORMAT, latitude, longitude, mAccessToken);
+                    String getParams = String.format(Locale.ENGLISH, LOCATIONS_ENDPOINT_FORMAT,
+                            latitude, longitude, mAccessToken);
                     String url = API_URL + getParams;
                     String response = getRequest(url);
 
