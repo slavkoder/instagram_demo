@@ -9,13 +9,11 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -33,9 +31,9 @@ public class InstagramDialog extends Dialog {
 	static final float[] DIMENSIONS_LANDSCAPE = { 460, 260 };
 	static final float[] DIMENSIONS_PORTRAIT = { 280, 420 };
 
-	static final FrameLayout.LayoutParams FILL = new FrameLayout.LayoutParams(
-			ViewGroup.LayoutParams.FILL_PARENT,
-			ViewGroup.LayoutParams.FILL_PARENT);
+	static final LinearLayout.LayoutParams FILL = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.FILL_PARENT,
+            LinearLayout.LayoutParams.FILL_PARENT);
 
 	static final int MARGIN = 4;
 	static final int PADDING = 2;
@@ -74,7 +72,7 @@ public class InstagramDialog extends Dialog {
 		float[] dimensions = (display.getWidth() < display.getHeight()) ? DIMENSIONS_PORTRAIT
 				: DIMENSIONS_LANDSCAPE;
 
-		addContentView(mContent, new FrameLayout.LayoutParams(
+		addContentView(mContent, new LinearLayout.LayoutParams(
 				(int) (dimensions[0] * scale + 0.5f), (int) (dimensions[1]
 						* scale + 0.5f)));
 		CookieSyncManager.createInstance(getContext());
@@ -95,12 +93,12 @@ public class InstagramDialog extends Dialog {
 
 	private void setUpWebView() {
 		mWebView = new WebView(getContext());
+        mWebView.setLayoutParams(FILL);
 		mWebView.setVerticalScrollBarEnabled(false);
 		mWebView.setHorizontalScrollBarEnabled(false);
 		mWebView.setWebViewClient(new OAuthWebViewClient());
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.loadUrl(mUrl);
-		mWebView.setLayoutParams(FILL);
 		mContent.addView(mWebView);
 	}
 

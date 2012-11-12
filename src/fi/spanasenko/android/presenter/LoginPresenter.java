@@ -86,7 +86,7 @@ public class LoginPresenter extends PresenterBase<ILoginView> implements ILoginP
                 getView().dismissBusyDialog();
 
                 // Ignore dialog dismissed event.
-                if (!error.equals(InstagramDialog.DISMISSED)) {
+                if (!error.getMessage().equals(InstagramDialog.DISMISSED)) {
                     getView().onError(error);
                 }
             }

@@ -53,7 +53,7 @@ public class NearbyLocationPresenter extends PresenterBase<INearbyLocationsView>
                     @Override
                     protected void onError(Exception error) {
                         getView().dismissBusyDialog();
-                        onError(error);
+                        getView().onError(error);
                     }
                 });
     }
