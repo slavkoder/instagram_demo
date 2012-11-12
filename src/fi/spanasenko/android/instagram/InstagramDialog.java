@@ -28,6 +28,8 @@ import android.widget.TextView;
  */
 public class InstagramDialog extends Dialog {
 
+    public static final String DISMISSED = "dismissed";
+
 	static final float[] DIMENSIONS_LANDSCAPE = { 460, 260 };
 	static final float[] DIMENSIONS_PORTRAIT = { 280, 420 };
 
@@ -104,7 +106,8 @@ public class InstagramDialog extends Dialog {
 
     @Override
     public void onBackPressed() {
-        mListener.onError("Cancelled");
+        // Just to let the caller know that dialog was dismissed.
+        mListener.onError(DISMISSED);
         super.onBackPressed();
     }
 

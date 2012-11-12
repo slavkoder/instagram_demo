@@ -7,10 +7,7 @@ import android.provider.Settings;
 import fi.spanasenko.android.LocationsMapActivity;
 import fi.spanasenko.android.NearbyLocationsActivity;
 import fi.spanasenko.android.R;
-import fi.spanasenko.android.instagram.InstagramApi;
-import fi.spanasenko.android.instagram.OperationCallback;
-import fi.spanasenko.android.instagram.OperationCallbackBase;
-import fi.spanasenko.android.instagram.VoidOperationCallback;
+import fi.spanasenko.android.instagram.*;
 import fi.spanasenko.android.utils.UserSettings;
 import fi.spanasenko.android.view.ILoginView;
 
@@ -88,7 +85,10 @@ public class LoginPresenter extends PresenterBase<ILoginView> implements ILoginP
             protected void onError(Exception error) {
                 getView().dismissBusyDialog();
 
-                getView().onError(error);
+                // Ignore dialog dismissed event.
+                if (!error.equals(InstagramDialog.DISMISSED)) {
+                    getView().onError(error);
+                }
             }
         });
     }
