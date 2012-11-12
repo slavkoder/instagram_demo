@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.view.IBaseView;
 
 import java.lang.ref.WeakReference;
@@ -56,6 +57,10 @@ public abstract class PresenterBase<T extends IBaseView> implements IBasePresent
 
     protected void openActivity(Intent intent) {
         getView().startActivity(intent);
+    }
+
+    protected void openAcitivtyForResult(Intent intent, VoidOperationCallback callback) {
+        getView().startActivityForResult(intent, callback);
     }
 
 }

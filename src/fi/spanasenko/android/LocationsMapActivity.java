@@ -25,6 +25,7 @@ import fi.spanasenko.android.utils.UserSettings;
 import fi.spanasenko.android.utils.Utils;
 import fi.spanasenko.android.view.INearbyLocationsView;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -52,6 +53,9 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
     private String notifyUserMessage;
 
     protected Exception displayErrorException;
+
+    private HashMap<Integer, VoidOperationCallback> resultCallbacks = new HashMap<Integer, VoidOperationCallback>();
+    private int lastActivityCode = 0;
 
     private static final String BUSY_DIALOG_VISIBLE_INSTANCE_STATE_KEY = "isBusyDialogVisible";
     private static final String BUSY_DIALOG_MESSAGE_INSTANCE_STATE_KEY = "busyDialogMessage";
@@ -98,7 +102,6 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
 
         // Create overlay to display user's current location.
         mMyLocationOverlay = new MyLocationOverlay(this, mMapView);
-        mMyLocationOverlay.enableMyLocation();
         mMapOverlays.add(mMyLocationOverlay);
 
         if (savedInstanceState == null) {
@@ -144,6 +147,7 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
             finish();
         }
 
+        mMyLocationOverlay.enableMyLocation();
         mPresenter.registerLocationObserver();
     }
 
@@ -151,6 +155,7 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
     protected void onPause() {
         super.onPause();
 
+        mMyLocationOverlay.disableMyLocation();
         mPresenter.unregisterLocationObserver();
     }
 
@@ -363,6 +368,25 @@ public class LocationsMapActivity extends MapActivity implements INearbyLocation
     @Override
     public String getStringResource(int resourceId) {
         return getString(resourceId);
+    }
+
+
+    @Override
+    public void startActivityForResult(Intent intent, VoidOperationCallback callback) {
+        startActivityForResult(intent, lastActivityCode);
+        resultCallbacks.put(lastActivityCode, callback);
+        lastActivityCode++;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        VoidOperationCallback callback = resultCallbacks.get(requestCode);
+        if (callback != null) {
+            resultCallbacks.remove(requestCode);
+            callback.notifyCompleted();
+        }
     }
 
     @Override

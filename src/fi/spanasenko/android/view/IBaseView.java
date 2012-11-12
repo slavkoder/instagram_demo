@@ -3,6 +3,7 @@ package fi.spanasenko.android.view;
 import android.content.Context;
 import android.content.Intent;
 import fi.spanasenko.android.instagram.OperationCallback;
+import fi.spanasenko.android.instagram.VoidOperationCallback;
 
 /**
  * IBaseView.
@@ -73,6 +74,13 @@ public interface IBaseView {
      * @param intent Intent to start.
      */
     void startActivity(Intent intent);
+
+    /**
+     * Starts activity for result.
+     * @param intent Intent to start.
+     * @param callback Callback called in on result.
+     */
+    void startActivityForResult(Intent intent, VoidOperationCallback callback);
 
     /**
      * Returns current activity context.

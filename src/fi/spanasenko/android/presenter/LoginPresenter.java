@@ -49,11 +49,21 @@ public class LoginPresenter extends PresenterBase<ILoginView> implements ILoginP
                         protected void onCompleted(String result) {
                             if (result.equals(getView().getStringResource(android.R.string.yes))) {
                                 // Show device settings
-                                openActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                            }
+                                openAcitivtyForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), new VoidOperationCallback() {
 
-                            // Decision is made, now we can show next view.
-                            openPreferredView();
+                                    @Override
+                                    protected void onCompleted() {
+                                        // Decision is made, now we can show next view.
+                                        openPreferredView();
+                                    }
+
+                                    @Override
+                                    protected void onError(Exception error) {
+                                        // Decision is made, now we can show next view.
+                                        openPreferredView();
+                                    }
+                                });
+                            }
                         }
 
                         @Override

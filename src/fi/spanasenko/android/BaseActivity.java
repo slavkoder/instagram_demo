@@ -14,6 +14,8 @@ import fi.spanasenko.android.instagram.VoidOperationCallback;
 import fi.spanasenko.android.utils.UiUtils;
 import fi.spanasenko.android.view.IBaseView;
 
+import java.util.HashMap;
+
 /**
  * BaseActivity
  * Encapsulates methods commonly used by other activities, such as showing busy dialog.
@@ -29,6 +31,9 @@ public class BaseActivity extends Activity implements IBaseView {
     private String busyDialogMessage;
     private String notifyUserTitle;
     private String notifyUserMessage;
+
+    private HashMap<Integer, VoidOperationCallback> resultCallbacks = new HashMap<Integer, VoidOperationCallback>();
+    private int lastActivityCode = 0;
 
     protected Exception displayErrorException;
 
@@ -224,6 +229,24 @@ public class BaseActivity extends Activity implements IBaseView {
     public void startActivity(Intent intent) {
         super.startActivity(intent);
 
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, VoidOperationCallback callback) {
+        startActivityForResult(intent, lastActivityCode);
+        resultCallbacks.put(lastActivityCode, callback);
+        lastActivityCode++;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        VoidOperationCallback callback = resultCallbacks.get(requestCode);
+        if (callback != null) {
+            resultCallbacks.remove(requestCode);
+            callback.notifyCompleted();
+        }
     }
 
     @Override

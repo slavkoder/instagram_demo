@@ -24,8 +24,8 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         if (extra != null && extra.getBoolean(BaseActivity.EXTRA_LOGOUT)) {
             mPresenter.logout();
         } else {
-            InstagramDemoApp.getInstance(this).setLoggingOut(false);
-            mPresenter.checkAuthorizationAndShowNextView();
+            // Initiate login
+            onLoginClicked(null);
         }
     }
 
@@ -39,7 +39,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
      * @param v Reference to the caller view.
      */
     public void onLoginClicked(View v) {
-        mPresenter.authorize();
         InstagramDemoApp.getInstance(this).setLoggingOut(false);
+        mPresenter.authorize();
     }
 }
