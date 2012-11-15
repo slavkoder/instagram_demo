@@ -71,6 +71,7 @@ public class GalleryAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
+        holder.image.getImageView().setIsFixedSize(true);
         mImageDownloader.download(thumbnail.getUrl(), holder.image, 0);
 
         return view;

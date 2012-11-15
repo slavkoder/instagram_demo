@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import fi.spanasenko.android.R;
@@ -20,7 +19,7 @@ public class ImageLoaderView extends LinearLayout {
 
     private Context mContext;
     private ProgressBar mSpinner;
-    private ImageView mImage;
+    private MyImageView mImage;
 
     /**
      * This is used when creating the view in XML.
@@ -50,7 +49,7 @@ public class ImageLoaderView extends LinearLayout {
         mContext = context;
         setGravity(Gravity.CENTER);
 
-        mImage = new ImageView(mContext);
+        mImage = new MyImageView(mContext);
         mImage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT));
 
@@ -101,7 +100,7 @@ public class ImageLoaderView extends LinearLayout {
      * Returns ImageView associated with this instance.
      * @return ImageView associated with this instance.
      */
-    public ImageView getImageView() {
+    public MyImageView getImageView() {
         return mImage;
     }
 }
